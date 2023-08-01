@@ -1,0 +1,44 @@
+---
+
+# TODO(p2004a): Clean up rclone deletion after migration to map_syncer is done.
+- name: Stop rclone if it exist
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  ignore_errors: true
+  with_items:
+    - rclone-maps.service
+    - rclone-maps.timer
+
+- name: Rclone files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ user_homedir }}/.config/rclone/"
+    - /etc/systemd/system/rclone-maps.service
+    - /etc/systemd/system/rclone-maps.timer
+
+- name: Remove rclone
+  ansible.builtin.command:
+    cmd: deb-get purge --remove-repo rclone
+  ignore_errors: true
+
+- name: Remove deb-get
+  ansible.builtin.apt:
+    autoremove: true
+    name: deb-get
+    purge: true
+    state: absent
+
+- name: Install map syncer dependencies
+  ansible.builtin.package:
+    name: python3-paho-mqtt
+    state: present
+
+- name: Install map_syncer script
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/beyond-all-reason/maps-metadata/main/tools/map_syncer/map_syncer.py
+    dest: /usr/local/bin/map_syncer.py
+    mode: '0755'

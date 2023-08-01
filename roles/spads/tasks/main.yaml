@@ -20,11 +20,9 @@
   ansible.builtin.import_tasks:
     file: installSPADS.yaml
 
-- name: Configure rclone
-  become: true
-  become_user: "{{ spads_username }}"
+- name: Install map_syncer
   ansible.builtin.import_tasks:
-    file: rclone.yaml
+    file: map_syncer.yaml
 
 - name: Configure services
   ansible.builtin.import_tasks:

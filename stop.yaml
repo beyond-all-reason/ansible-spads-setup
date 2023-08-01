@@ -11,12 +11,11 @@
         enabled: false
       with_items:
         - pr-downloader.timer
-        - rclone-maps.timer
         - spads_config_updater.timer
         - pr-downloader.service
-        - rclone-maps.service
         - spring-setcpuaffinity.service
         - spads_config_updater.service
+        - map_syncer.service
 
     - name: Stop and disable SPADS
       ansible.builtin.systemd:

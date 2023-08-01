@@ -8,15 +8,10 @@
     src: "pr-downloader.timer.j2"
     dest: "/etc/systemd/system/pr-downloader.timer"
 
-- name: Copy rclone-maps service template file to remote host
+- name: Copy map_syncer service template file to remote host
   ansible.builtin.template:
-    src: "rclone-maps.service.j2"
-    dest: "/etc/systemd/system/rclone-maps.service"
-
-- name: Copy rclone-maps timer template file to remote host
-  ansible.builtin.template:
-    src: "rclone-maps.timer.j2"
-    dest: "/etc/systemd/system/rclone-maps.timer"
+    src: "map_syncer.service.j2"
+    dest: "/etc/systemd/system/map_syncer.service"
 
 - name: Copy spads_config_updater service template file to remote host
   ansible.builtin.template:

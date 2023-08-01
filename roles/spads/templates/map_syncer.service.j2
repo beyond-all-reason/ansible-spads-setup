@@ -1,0 +1,13 @@
+[Unit]
+Description=Beyond-All-Reason Map Syncer
+Documentation=https://github.com/beyond-all-reason/maps-metadata/tree/main/tools/map_syncer
+
+[Service]
+Type=simple
+User={{ spads_username }}
+ExecStart=/usr/local/bin/map_syncer.py --log-level INFO --mqtt-host {{ mapSyncer_mqttBroker }} --healthcheck-url {{ mapSyncer_healthcheckUrl }} --delete-after 86400 {{ spads_install_path }}/var/spring/data/maps
+TimeoutStopSec=30
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

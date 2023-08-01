@@ -42,37 +42,6 @@
 - debug: var=out.stdout_lines
   when: result is failed
 
-- name: Install deb-get
-  ansible.builtin.shell:
-    cmd: curl -sL https://raw.githubusercontent.com/wimpysworld/deb-get/main/deb-get | sudo -E bash -s install deb-get
-    creates: "/usr/bin/deb-get"
-  register: out
-
-- debug: var=out.stdout_lines
-
-- name: Update deb-get package list
-  ansible.builtin.command:
-    cmd: deb-get update
-  register: out
-  changed_when: false
-
-- debug: var=out.stdout_lines
-
-- name: Install rclone
-  ansible.builtin.command:
-    cmd: deb-get install rclone
-    creates: "/usr/bin/rclone"
-  register: out
-  changed_when: "'Setting up rclone' in out.stdout"
-
-- debug: var=out.stdout_lines
-
-- name: Upgrade deb-get packages
-  ansible.builtin.command:
-    cmd: deb-get upgrade -y
-  register: out
-  changed_when: "'0 upgraded, 0 newly installed' not in out.stdout"
-
 - debug: var=out.stdout_lines
 
 - name: Set hostname

@@ -14,8 +14,7 @@
       with_items:
         - pr-downloader.service
         - pr-downloader.timer
-        - rclone-maps.service
-        - rclone-maps.timer
+        - map_syncer.service
         - spads_config_updater.service
         - spads_config_updater.timer
 
@@ -28,7 +27,6 @@
         - "{{ spads_install_path }}"
         - /etc/systemd/system/pr-downloader.service
         - /etc/systemd/system/pr-downloader.timer
-        - /etc/systemd/system/rclone-maps.service
-        - /etc/systemd/system/rclone-maps.timer
+        - /etc/systemd/system/map_syncer.service
         - /etc/systemd/system/spads_config_updater.service
         - /etc/systemd/system/spads_config_updater.timer

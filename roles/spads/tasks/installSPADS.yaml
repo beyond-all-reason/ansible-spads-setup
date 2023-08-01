@@ -13,6 +13,12 @@
     path: "{{ spads_install_path }}/etc"
     state: directory
 
+- name: Make sure maps directory exits
+  ansible.builtin.file:
+    path: "{{ spads_install_path }}/var/spring/data/maps"
+    state: directory
+    recurse: yes
+
 - name: Checkout SPADS
   ansible.builtin.git:
     repo: 'https://github.com/beyond-all-reason/spads_config_bar.git'
@@ -90,7 +96,7 @@
 
 - name: Run pr-downloader
   ansible.builtin.command:
-    cmd: "{{ spads_install_path }}/pr-downloader --filesystem-writepath {{ spads_install_path }}/var/spring/data byar:test"
+    cmd: "env PRD_RAPID_USE_STREAMER=false PRD_RAPID_REPO_MASTER=https://repos.beyondallreason.dev/repos.gz {{ spads_install_path }}/pr-downloader --filesystem-writepath {{ spads_install_path }}/var/spring/data byar:test"
     creates: "{{ spads_install_path }}/var/spring/data"
   register: out
 

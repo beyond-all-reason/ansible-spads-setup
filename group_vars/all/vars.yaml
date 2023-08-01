@@ -14,10 +14,6 @@ sftp_password: "{{ vault_sftp_password }}"
 engine_github_path: https://github.com/beyond-all-reason/spring/releases/download/spring_bar_%7BBAR105%7D105.1.1-1821-gaca6f20/spring_bar_.BAR105.105.1.1-1821-gaca6f20_linux-64-minimal-portable.7z
 engine_dir: spring_bar_.BAR105.105.1.1-1821-gaca6f20_linux-64-minimal-portable
 
-# skips the rclone sync during the play.yaml playbook as it takes a long time
-# note: rclone still syncs when ansible starts the service
-skip_rclone_sync: true
-
 # allows system monitoring, currently with checkmk
 checkmk_monitoring_enabled: true
 checkmk_monitoring_port: 6556
@@ -93,9 +89,5 @@ autoinstaller_lobbyLogin: "[teh]cluster"
 autoinstaller_lobbyPassword: changeme
 autoinstaller_owner: changeme
 
-# rclone config options
-# this is applied only once, rclone takes over once the file is initially written
-rclone_type: drive
-rclone_scope: drive.readonly
-rclone_token: "{{ vault_rclone_token }}"
-rclone_team_drive: ""
+mapSyncer_mqttBroker: broker.hivemq.com
+mapSyncer_healthcheckUrl: https://hc-ping.com/{{ vault_healthchecksioPingKey }}/spads-{{ inventory_hostname }}-maps-sync

@@ -11,9 +11,9 @@
         enabled: true
       with_items:
         - pr-downloader.timer
-        - rclone-maps.timer
         - spring-setcpuaffinity.service
         - spads_config_updater.timer
+        - map_syncer.service
 
     - name: Start and enable SPADS
       ansible.builtin.systemd:

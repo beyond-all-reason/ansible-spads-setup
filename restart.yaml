@@ -10,6 +10,7 @@
         state: restarted
       with_items:
         - pr-downloader.service
-        - rclone-maps.service
         - spads_config_updater.service
         - spads.service
+        - map_syncer.service
+
