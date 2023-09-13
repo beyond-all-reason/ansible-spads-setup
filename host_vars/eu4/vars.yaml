@@ -2,3 +2,4 @@ spads_hostRegion: '"ENGINE TESTING - 1"'
 spads_lobbyLogin: '[teh]clusterEU4'
 spads_channel: clusterEU4
 spads_baseGamePort: 53300
+engine_dir: "spring_bar_.BAR105.105.1.1-1896-ga739d9d_linux-64-minimal-portable"

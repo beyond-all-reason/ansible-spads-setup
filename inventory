@@ -1,16 +1,30 @@
+au1 ansible_host=139.99.194.68 ansible_user=ubuntu
+eu2 ansible_host=135.125.190.148 ansible_user=ubuntu
 # also hosts bar repos
 eu3 ansible_host=135.125.232.13 ansible_user=debian
 # engine test host
 eu4 ansible_host=176.57.150.243 ansible_user=debian
+eu5 ansible_host=45.85.250.178 ansible_user=debian
+us1 ansible_host=135.148.139.38 ansible_user=ubuntu
+us2 ansible_host=192.210.162.137 ansible_user=debian
+us3 ansible_host=207.244.249.133 ansible_user=debian
+us4 ansible_host=144.126.147.151 ansible_user=debian
 
 # add each server to the matching region below
 [au]
+au1
 
 [eu]
+eu2
 eu3
 eu4
+eu5
 
 [us]
+us1
+us2
+us3
+us4
 
 # the group containing each region
 [spads:children]

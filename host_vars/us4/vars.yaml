@@ -1,0 +1,6 @@
+spads_username: debian
+spads_hostRegion: '"US - 4"'
+spads_lobbyLogin: '[teh]clusterUS4'
+spads_channel: clusterUS4
+spads_maxInstances: 150
+spads_baseGamePort: 53300

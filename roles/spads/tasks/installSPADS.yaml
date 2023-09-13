@@ -95,10 +95,10 @@
   ansible.builtin.lineinfile:
     path: /home/{{ spads_username }}/.bashrc
     regexp: '^export SFTP_PASSWORD='
-    line: export SFTP_PASSWORD={{ sftp_password }}
+    line: 'export SFTP_PASSWORD="{{ sftp_password }}"'
 
 - name: Add SFTP_LOGIN to .bashrc
   ansible.builtin.lineinfile:
     path: /home/{{ spads_username }}/.bashrc
     regexp: '^export SFTP_LOGIN='
-    line: export SFTP_LOGIN={{ sftp_login }}
+    line: 'export SFTP_LOGIN="{{ sftp_login }}"'
