@@ -1,21 +1,38 @@
 - name: Allow and rate limit SSH
   community.general.ufw:
     rule: limit
-    port: ssh
-    proto: tcp
+    name: OpenSSH
 
-- name: Allow SPADS ports TCP/{{ spads_baseGamePort }}:{{ spads_baseGamePort + (spads_maxInstances * 2) }}
+- name: Install SPADS ufw config
+  ansible.builtin.template:
+    src: "ufw.spads.j2"
+    dest: "/etc/ufw/applications.d/spads"
+  when: checkmk_monitoring_enabled is true
+  notify: "Reload ufw profile configs"
+
+- name: Allow SPADS ports
   community.general.ufw:
     rule: allow
-    port: "{{ spads_baseGamePort }}:{{ spads_baseGamePort + (spads_maxInstances * 2) }}"
-    proto: tcp
+    name: SPADS
 
-- name: Allow system monitoring
+- name: Install checkmk ufw config
+  ansible.builtin.template:
+    src: "ufw.checkmk.j2"
+    dest: "/etc/ufw/applications.d/checkmk"
+  when: checkmk_monitoring_enabled is true
+  notify: "Reload ufw profile configs"
+
+- name: Allow checkmk agent ports
   community.general.ufw:
-    rule: limit
-    port: " {{ monitoring_port }}"
-    proto: tcp
-  when: monitoring_enabled is true
+    rule: allow
+    name: Checkmk Agent
+  when: checkmk_monitoring_enabled is true
+
+- name: Allow ports for additional services
+  community.general.ufw:
+    rule: allow
+    name: '{{ item }}'
+  loop: "{{ ufw_additional_profiles }}"
 
 - name: Ensure default deny for incoming traffic
   community.general.ufw:

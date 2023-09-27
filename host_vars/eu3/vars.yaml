@@ -3,3 +3,6 @@ spads_hostRegion: '"EU - 3"'
 spads_lobbyLogin: '[teh]clusterEU3'
 spads_channel: clusterEU3
 spads_maxInstances: 25
+# For rapid hosting
+ufw_additional_profiles:
+  - WWW Full

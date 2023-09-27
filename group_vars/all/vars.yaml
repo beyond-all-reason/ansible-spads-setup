@@ -19,32 +19,36 @@ engine_dir: spring_bar_.BAR105.105.1.1-1821-gaca6f20_linux-64-minimal-portable
 skip_rclone_sync: true
 
 # allows system monitoring, currently with checkmk
-monitoring_enabled: true
-monitoring_port: 6556 
+checkmk_monitoring_enabled: true
+checkmk_monitoring_port: 6556
+
+# allows to enable additonal services on the per-host basis
+ufw_additional_profiles: []
 
 package_dependencies:
-  - sudo
-  - wget
-  - curl
-  - htop
+  - acl
   - byobu
+  - cpanminus
+  - curl
+  - g++
+  - git
+  - htop
+  - libdbd-sqlite3-perl
+  - libffi-platypus-perl
+  - locate
+  - lsof
+  - make
   - mc
   - p7zip
-  - g++
-  - swig
-  - locate
-  - git
-  - python3-dev
-  - cpanminus
   - p7zip-full
-  - python3-distutils
-  - make
-  - sshpass
   - perl-doc
-  - acl
+  - python3-dev
+  - python3-distutils
+  - sshpass
+  - sudo
+  - swig
   - ufw
-  - libffi-platypus-perl
-  - libdbd-sqlite3-perl
+  - wget
 
 # swap size in megabytes
 swap_size: 4096

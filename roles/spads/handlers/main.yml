@@ -1,2 +1,7 @@
 ---
-# handlers file for spads
+- name: Reload ufw profile configs
+  # the community.general.ufw doesn't support the `ufw app update` command
+  ansible.builtin.shell: |
+    ufw app update all
+    ufw reload
+  become: yes
