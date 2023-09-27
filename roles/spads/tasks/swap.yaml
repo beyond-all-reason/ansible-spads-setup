@@ -1,6 +1,8 @@
 - name: Check if swap file exists
   ansible.builtin.stat:
     path: "{{ swap_file }}"
+    get_checksum: no
+    get_mime: no
   register: swap_file_check
 
 - name: Create swap file

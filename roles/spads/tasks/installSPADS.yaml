@@ -75,7 +75,7 @@
 - name: Change permissions of SPADS cluster launcher script
   ansible.builtin.file:
     path: "{{ spads_install_path }}/etc/spads_cluster_launcher.sh"
-    mode: 0775
+    mode: 0755
 
 - name: Copy pr-downloader into {{ spads_install_path }}
   ansible.builtin.copy:
