@@ -79,3 +79,9 @@
   ansible.builtin.hostname:
     name: "spads-{{ inventory_hostname }}"
   tags: container_incompatible
+
+- name: Set /etc/hosts 127.0.2.1 entry with new hostname
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.2\.1'
+    line: '127.0.2.1 spads-{{ inventory_hostname }}'
