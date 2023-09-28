@@ -1,7 +1,7 @@
 ---
 - name: Start SPADS
   hosts: all
-#  remote_user: root
+  become: yes
 
   tasks:
     - name: Enable SPADS timers
