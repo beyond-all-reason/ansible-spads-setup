@@ -7,7 +7,6 @@
   ansible.builtin.template:
     src: "ufw.spads.j2"
     dest: "/etc/ufw/applications.d/spads"
-  when: checkmk_monitoring_enabled is true
   notify: "Reload ufw profile configs"
 
 - name: Allow SPADS ports
@@ -24,7 +23,7 @@
 
 - name: Allow checkmk agent ports
   community.general.ufw:
-    rule: allow
+    rule: limit
     name: Checkmk Agent
   when: checkmk_monitoring_enabled is true
 
