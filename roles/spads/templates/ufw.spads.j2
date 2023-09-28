@@ -1,4 +1,4 @@
 [SPADS]
 title=SPADS
-description=Ports for the dedicated games hosted by SPADS
-ports={{ spads_baseGamePort }}:{{ spads_baseGamePort + (spads_maxInstances * 2) }}/tcp
+description=Ports for the dedicated games hosted by SPADS. UPD needed by engine and TCP needed by spads.
+ports={{ spads_baseGamePort }}:{{ spads_baseGamePort + (spads_maxInstances * 2) }}/tcp|{{ spads_baseGamePort }}:{{ spads_baseGamePort + (spads_maxInstances * 2) }}/udp
