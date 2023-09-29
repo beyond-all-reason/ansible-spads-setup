@@ -1,0 +1,8 @@
+[Unit]
+Description=Script that resets that CPU affinity of running spring-dedicated
+
+[Service]
+ExecStart={{ spads_install_path }}/setcpuaffinity.sh
+
+[Install]
+WantedBy=multi-user.target

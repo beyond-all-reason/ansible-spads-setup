@@ -28,6 +28,11 @@
     src: "spads_config_updater.timer.j2"
     dest: "/etc/systemd/system/spads_config_updater.timer"
 
+- name: Copy spring-setcpuaffinity service template file to remote host
+  ansible.builtin.template:
+    src: "spring-setcpuaffinity.service.j2"
+    dest: "/etc/systemd/system/spring-setcpuaffinity.service"
+
 - name: Copy SPADS service template file to remote host
   ansible.builtin.template:
     src: "spads.service.j2"

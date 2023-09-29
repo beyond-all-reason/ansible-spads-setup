@@ -15,6 +15,7 @@
         - spads_config_updater.timer
         - pr-downloader.service
         - rclone-maps.service
+        - spring-setcpuaffinity.service
         - spads_config_updater.service
 
     - name: Stop and disable SPADS

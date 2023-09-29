@@ -4,7 +4,7 @@
   become: yes
 
   tasks:
-    - name: Enable SPADS timers
+    - name: Enable and start SPADS timers and services
       ansible.builtin.systemd:
         name: "{{ item }}"
         state: started
@@ -12,6 +12,7 @@
       with_items:
         - pr-downloader.timer
         - rclone-maps.timer
+        - spring-setcpuaffinity.service
         - spads_config_updater.timer
 
     - name: Start and enable SPADS
