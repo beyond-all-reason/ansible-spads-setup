@@ -1,4 +1,7 @@
 #!/bin/bash
+{
+# This brace above is important: https://stackoverflow.com/questions/2285403/how-to-make-shell-scripts-robust-to-source-being-changed-as-they-run/2358432#2358432
+
 
 # Some notes on cluster launchers:
 # Documentation: https://springrts.com/phpbb/viewtopic.php?p=596209#p596209
@@ -40,7 +43,6 @@
 #    e.g. CMD_hostRegion="EU - " with the quotes and the spaces will be EU - 02 for instance 2
 # Dont forget the trailing backslashes at the ends of lines!
 
-
 perl ../spads.pl spads_cluster.conf \
 	CMD_lobbyLogin={{ spads_lobbyLogin }} \
 	CMD_spadsChannel={{ spads_channel }} \
@@ -59,4 +61,97 @@ perl ../spads.pl spads_cluster.conf \
 	CMD_targetSpares={{ spads_targetSpares }} \
 	CMD_clusters={{ spads_clusters }} \
 	CMD_hostIp={{ spads_hostIp }} \
-	CMD_autoLoadPlugins={{ spads_autoLoadPlugins }}
+	CMD_autoLoadPlugins={{ spads_autoLoadPlugins }} \
+	&
+
+
+# The section below handles the spads manager process when running as a systemd
+# service. We handle:
+#   - SIGHUP: reloads SPADS by just restarting the manager and not touching
+#     the invividual rooms.
+#   - SIGINT and SIGTERM: it sends SIGTERM to manager and all the rooms. Then it
+#     waits for all of them to exit. This effectively works like !quit and allows
+#     the ongoing games to finish.
+# We also send systemd notifications to indicate the current status of SPADS.
+
+manager_pid=$!
+
+spads_instance_pattern='spads.pl.*InstanceName='
+engine_pattern='spring-dedicated'
+inactive_stop_timeout=60
+
+reload=false
+
+trap 'reload=true; kill $manager_pid;' SIGHUP
+trap 'kill $manager_pid;' SIGINT SIGTERM
+
+# Helper function for executing pkill,pidwait,pgrep for all processes
+# in the same cgroup as the current process. Each systemd service has
+# it's own cgroup.
+function child_ {
+	# TODO: Actually use --cgroup flag once we are on the fresher system like
+	#       current stable Debian 12 that has it.
+	# "$1" --cgroup $(cat /proc/$$/cgroup | cut -b 4-) -f "${@:2}"
+	"$1" -f "${@:2}"
+}
+
+systemd-notify --ready --status="SPADS started"
+
+# Send status updates every 10 seconds to systemd.
+(
+	running=true
+	sleep_pid=0
+	trap 'running=false; kill $sleep_pid' SIGTERM
+	while [[ $running = true ]]; do
+		spads_count=$(child_ pgrep $spads_instance_pattern | wc -l)
+		games_count=$(child_ pgrep $engine_pattern | wc -l)
+		systemd-notify --status="Instances: $spads_count Running games: $games_count"
+		sleep 10 &
+		sleep_pid=$!
+		wait $sleep_pid
+	done
+) &
+status_loop_pid=$!
+
+# wait returns exit code > 128 if it was interrupted by a signal, so we wrap
+# it in a loop
+manager_exit_code=129
+while (( $manager_exit_code > 128 )); do
+	wait $manager_pid
+	manager_exit_code=$?
+done
+
+kill $status_loop_pid
+wait $status_loop_pid
+
+if [[ $reload = true ]]; then
+	if (( $manager_exit_code != 0 )); then
+		exit $manager_exit_code
+	fi
+
+	systemd-notify --status="Waiting $inactive_stop_timeout seconds for inactive instances to stop..."
+	sleep $(( $inactive_stop_timeout + 5 ))
+
+	# TODO: for Type=notify-reload, --reloading arg available only since systemd v253
+	systemd-notify --status="Restarting SPADS manager..."
+	exec "$0"
+else
+	# TODO: for Type=notify-reload, --stopping arg available only since systemd v253
+	systemd-notify --status="Waiting for room SPADS instances to exit..."
+	child_ pkill $spads_instance_pattern
+
+	# TODO: pidwait is broken on Debian 11... https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1006395
+	#       so we do manual loop over proc...
+	# child_ pidwait $spads_instance_pattern
+
+	for pid in $(child_ pgrep $spads_instance_pattern); do
+		while [[ -f /proc/$pid/comm ]]; do
+			sleep 1
+		done
+	done
+
+	systemd-notify --status="Exiting"
+	exit $manager_exit_code
+fi
+
+}
