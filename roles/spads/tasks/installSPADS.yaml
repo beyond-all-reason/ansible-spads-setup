@@ -77,6 +77,11 @@
     path: "{{ spads_install_path }}/etc/spads_cluster_launcher.sh"
     mode: 0755
 
+- name: Change permissions of setcpuaffinity.sh script
+  ansible.builtin.file:
+    path: "{{ spads_install_path }}/setcpuaffinity.sh"
+    mode: 0755
+
 - name: Copy pr-downloader into {{ spads_install_path }}
   ansible.builtin.copy:
     src: "{{ spads_install_path }}/var/spring/{{ engine_dir }}/pr-downloader"
