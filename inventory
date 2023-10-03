@@ -1,4 +1,4 @@
-au1 ansible_host=139.99.194.68 ansible_user=ubuntu
+au1 ansible_host=139.99.194.68 ansible_user=debian
 eu2 ansible_host=135.125.190.148 ansible_user=ubuntu
 # also hosts bar repos
 eu3 ansible_host=135.125.232.13 ansible_user=debian
