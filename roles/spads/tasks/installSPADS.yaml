@@ -96,19 +96,10 @@
 
 - debug: var=out.stdout_lines
 
-- name: Drop SFTP_PASSWORD to .bashrc
-  ansible.builtin.lineinfile:
-    path: /home/{{ spads_username }}/.bashrc
-    regexp: '^export SFTP_PASSWORD='
-    state: absent
-
-- name: Drop SFTP_LOGIN to .bashrc
-  ansible.builtin.lineinfile:
-    path: /home/{{ spads_username }}/.bashrc
-    regexp: '^export SFTP_LOGIN='
-    state: absent
-
 - name: Setup secrets.env file
   ansible.builtin.template:
     src: "secrets.env.j2"
     dest: "{{ spads_install_path }}/secrets.env"
+  # let's not print secrets in the log
+  no_log: true
+  diff: no
