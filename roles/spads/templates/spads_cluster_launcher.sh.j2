@@ -44,11 +44,11 @@
 # Dont forget the trailing backslashes at the ends of lines!
 
 perl ../spads.pl spads_cluster.conf \
-	CMD_lobbyLogin={{ spads_lobbyLogin }} \
+	CMD_lobbyLogin=$SPADS_LOBBY_LOGIN \
 	CMD_spadsChannel={{ spads_channel }} \
-	CMD_lobbyPassword={{ spads_lobbyPassword }} \
+	CMD_lobbyPassword=$SPADS_LOBBY_PASSWORD \
 	CMD_lobbyHost={{ spads_lobbyHost }} \
-	CMD_registrationEmail={{ spads_registrationEmail }} \
+	CMD_registrationEmail=$SPADS_REGISTRATION_EMAIL \
 	CMD_baseGamePort={{ spads_baseGamePort }} \
 	CMD_baseAutoHostPort={{ spads_baseAutoHostPort }} \
 	CMD_hostRegion={{ spads_hostRegion }} \

@@ -11,6 +11,7 @@ Restart=on-failure
 RestartSec=60s
 User={{ spads_username }}
 WorkingDirectory={{ spads_install_path }}/etc
+EnvironmentFile={{ spads_install_path }}/secrets.env
 ExecStart={{ spads_install_path }}/etc/spads_cluster_launcher.sh
 # TODO: Type=notify-reload is available only since systemd v253 :(
 ExecReload=/bin/kill -HUP $MAINPID
