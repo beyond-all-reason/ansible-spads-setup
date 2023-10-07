@@ -12,6 +12,7 @@
   ansible.builtin.import_tasks:
     file: swap.yaml
   tags: container_incompatible
+  when: configure_swap
 
 - name: Install SPADS
   become: true

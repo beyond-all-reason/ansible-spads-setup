@@ -52,6 +52,7 @@ package_dependencies:
   - wget
 
 # swap size in megabytes
+configure_swap: yes
 swap_size: 4096
 swap_file: /var/swap.img
 swap_swappiness: '10'

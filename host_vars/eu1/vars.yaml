@@ -1,0 +1,6 @@
+spads_hostRegion: '"EU - "'
+spads_lobbyLogin: '[teh]cluster1'
+spads_channel: clusterEU1
+spads_maxInstances: 90
+# this instance is a LXD container running in system with swap
+configure_swap: false
