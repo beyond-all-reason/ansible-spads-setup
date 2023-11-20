@@ -1,6 +1,7 @@
 ---
 - name: Update SPADS engine
   hosts: all
+  become: yes
 #  remote_user: root
 
   tasks:
