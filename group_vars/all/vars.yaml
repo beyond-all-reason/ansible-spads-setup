@@ -11,8 +11,10 @@ allow_delete: false
 sftp_login: "{{ vault_sftp_login }}"
 sftp_password: "{{ vault_sftp_password }}"
 
-engine_github_path: https://github.com/beyond-all-reason/spring/releases/download/spring_bar_%7BBAR105%7D105.1.1-1821-gaca6f20/spring_bar_.BAR105.105.1.1-1821-gaca6f20_linux-64-minimal-portable.7z
-engine_dir: spring_bar_.BAR105.105.1.1-1821-gaca6f20_linux-64-minimal-portable
+# Important: The URL's for engine releases contain %7B characters for brackets. It seems that wget does not always like these, so replace with {}
+# Note that these characters get replaced with '.' characters for the engine_dir
+engine_github_path: https://github.com/beyond-all-reason/spring/releases/download/spring_bar_{BAR105}105.1.1-2113-g619dada/spring_bar_.BAR105.105.1.1-2113-g619dada_linux-64-minimal-portable.7z
+engine_dir: spring_bar_.BAR105.105.1.1-2113-g619dada_linux-64-minimal-portable
 
 # allows system monitoring, currently with checkmk
 checkmk_monitoring_enabled: true
