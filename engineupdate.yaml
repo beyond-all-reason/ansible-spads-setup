@@ -5,16 +5,25 @@
 
   tasks:
     - name: Run spads_config_bar_updater.py -c -u
+      become: yes
+      become_user: "{{ spads_username }}"
       ansible.builtin.command:
         cmd: "python3 {{ spads_install_path }}/spads_config_bar/spads_config_bar_updater.py -c -u {{ engine_github_path }}"
         # creates: "{{ spads_install_path }}/var/spring/{{ engine_dir }}/springsettings.cfg"
       register: out
 
     - debug: var=out.stdout_lines
-
-    - name: Restart SPADS
+    
+    - name: Reload SPADS
+      become: yes
       ansible.builtin.systemd:
         name: "{{ item }}"
-        state: restarted
+        state: reloaded
       with_items:
         - spads.service
+        
+    - name: Quit all SPADs game instances
+      become: yes
+      ansible.builtin.command:
+        cmd: "pkill -f 'spads.pl.*InstanceName='"
+
