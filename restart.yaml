@@ -1,6 +1,7 @@
 ---
 - name: Restart SPADS
   hosts: all
+  become: yes
 #  remote_user: root
 
   tasks:
