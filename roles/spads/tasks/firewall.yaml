@@ -18,14 +18,14 @@
   ansible.builtin.template:
     src: "ufw.checkmk.j2"
     dest: "/etc/ufw/applications.d/checkmk"
-  when: checkmk_monitoring_enabled is true
+  when: checkmk_monitoring_enabled == true
   notify: "Reload ufw profile configs"
 
 - name: Allow checkmk agent ports
   community.general.ufw:
     rule: limit
     name: Checkmk Agent
-  when: checkmk_monitoring_enabled is true
+  when: checkmk_monitoring_enabled == true
 
 - name: Allow ports for additional services
   community.general.ufw:
