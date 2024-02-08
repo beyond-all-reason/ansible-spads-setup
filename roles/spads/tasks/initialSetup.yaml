@@ -12,6 +12,10 @@
     name: "*"
     state: latest
 
+- name: Set timezone to UTC
+  community.general.timezone:
+    name: Etc/UTC
+
 - name: Install required packages
   ansible.builtin.package:
     pkg: "{{ package_dependencies }}"
