@@ -1,6 +1,5 @@
-
-spads_username: "{{ vault_spads_username }}"
-spads_user_password: "{{ vault_spads_user_password }}"
+spads_username: spads
+spads_user_password: "!"
 # if running SPADS as root then user_homedir needs to be /root
 user_homedir: /home/{{ spads_username }}
 spads_install_path: "{{ user_homedir }}/spads"
@@ -8,19 +7,11 @@ spads_install_path: "{{ user_homedir }}/spads"
 # skips the tasks in the delete.yaml playbook if false as a safety mechanism
 allow_delete: false
 
-sftp_login: "{{ vault_sftp_login }}"
-sftp_password: "{{ vault_sftp_password }}"
-
 # Important: The URL's for engine releases contain %7B characters for brackets. It seems that wget does not always like these, so replace with {}
 # Note that these characters get replaced with '.' characters for the engine_dir
 engine_version_base: 2314-g9e0bf7d
 engine_github_path: https://github.com/beyond-all-reason/spring/releases/download/spring_bar_{BAR105}105.1.1-2358-g9099868/spring_bar_.BAR105.105.1.1-2358-g9099868_linux-64-minimal-portable.7z
 engine_dir: spring_bar_.BAR105.105.1.1-2358-g9099868_linux-64-minimal-portable
-
-
-# allows system monitoring, currently with checkmk
-checkmk_monitoring_enabled: true
-checkmk_monitoring_port: 6556
 
 # allows to enable additonal services on the per-host basis
 ufw_additional_profiles: []
@@ -45,24 +36,20 @@ package_dependencies:
   - procps
   - python3-dev
   - python3-distutils
+  - screen
   - sshpass
   - sudo
   - swig
+  - tmux
   - ufw
   - wget
 
-# swap size in megabytes
-configure_swap: yes
-swap_size: 4096
-swap_file: /var/swap.img
-swap_swappiness: '10'
-
 # the following are for spads_cluster_launcher.sh
-spads_lobbyLogin: '[teh]cluster1'
+spads_lobbyLogin:
+spads_lobbyPassword:
+spads_registrationEmail:
+spads_lobbyHost:
 spads_channel:
-spads_lobbyPassword: "{{ vault_spads_lobbyPassword }}"
-spads_registrationEmail: "{{ vault_spads_registrationEmail }}"
-spads_lobbyHost: server4.beyondallreason.info
 spads_baseGamePort: 53200
 spads_baseAutoHostPort: 53100
 spads_hostRegion: '"UNKNOWN - "'  # To be better defined in per group vars
@@ -94,4 +81,3 @@ autoinstaller_lobbyPassword: changeme
 autoinstaller_owner: changeme
 
 mapSyncer_mqttBroker: broker.hivemq.com
-mapSyncer_healthcheckUrl: https://hc-ping.com/{{ vault_healthchecksioPingKey }}/spads-{{ inventory_hostname }}-maps-sync

@@ -1,0 +1,7 @@
+sftp_login: "invalid"
+sftp_password: "invalid"
+checkmk_monitoring_enabled: false
+configure_swap: no
+spads_lobbyHost: localhost
+spads_registrationEmail: "bot@spads.local"
+mapSyncer_healthcheckUrl: null

@@ -16,20 +16,12 @@ us4 ansible_host=144.126.147.151 ansible_user=debian
 au1
 
 [eu]
-eu2
-eu3
-eu4
-eu5
-eu6
+eu[1:6]
 
 [us]
-us1
-us2
-us3
-us4
+us[1:4]
 
-# the group containing each region
-[spads:children]
+[prod:children]
 au
 eu
 us
