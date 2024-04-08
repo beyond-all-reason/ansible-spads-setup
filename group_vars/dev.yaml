@@ -1,7 +1,13 @@
+spads_lobbyHost: localhost
+spads_registrationEmail: "{{ inventory_hostname }}@spads.local"
+spads_hostRegion: '"TEST - "'
+# Not adding [teh] to the lobby login as it makes user name too long
+spads_lobbyLogin: "cluster{{ inventory_hostname | upper }}"
+spads_lobbyPassword: "cluster{{ inventory_hostname }}pass"
+spads_channel: "cluster{{ inventory_hostname | upper }}"
+spads_maxInstances: 20
 sftp_login: "invalid"
 sftp_password: "invalid"
 checkmk_monitoring_enabled: false
-configure_swap: no
-spads_lobbyHost: localhost
-spads_registrationEmail: "bot@spads.local"
+configure_swap: false
 mapSyncer_healthcheckUrl: null

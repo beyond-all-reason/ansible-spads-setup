@@ -1,4 +1,6 @@
-# Ansible Installation
+# Ansible SPADS setup
+
+This repository contains Ansible playbooks for setting up SPADS servers.
 
 ## On each client (SPADS server)
 Install python3.
@@ -9,11 +11,11 @@ Install python3.
    > sudo apt install ansible sshpass
 2. SSH to each client once and accept their key to add them to the known hosts.
 3. Checkout this repo and then run any following Ansible command from the checked out folder.
-4. Modify the inventory file (use **ansible-vault edit inventory**) to have all the SPADS servers and also group them under [spads]
-5. Configure the variable files (use **ansible-vault edit (filename)**):
+4. Configure the variable files
    - groups_vars/all.yaml - contains the variables that will be applied to every spads server
-   - groups_vars/(region).yaml - contains the variables specific to a region (AU, EU, US). Anything set here will override groups_vars/all.yaml
-   - host_vars/(hostname).yaml - contains the variables specific to the host. Anything set here will override groups_vars/all.yaml and groups_vars/(region).yaml
+   - groups_vars/prod/vars.yaml - variables for every prod server. Anything set here will override groups_vars/all.yaml
+   - groups_vars/(region).yaml - variables specific to a region (AU, EU, US).
+   - host_vars/(hostname).yaml - contains the variables specific to the host. Anything set here will override all other
 6. Run Ansible. The typical syntax for running Ansible with some files encrypted with Ansible Vault is:
    > ansible-playbook (playbookfile) -i (inventoryfile) --ask-vault-pass
 
@@ -26,13 +28,10 @@ Install python3.
 # Examples
 
 **Configure/verify SPADS is configured properly on all servers**
-> ansible-playbook play.yaml -i inventory --ask-vault-pass
+> ansible-playbook play.yaml --ask-vault-pass
 
 **Restart all SPADS services only on US2**
-> ansible-playbook restart.yaml -i inventory --limit us2 --ask-vault-pass
-
-**Run Ansible with no encrpyted files**
-> ansible-playbook play.yaml -i inventory
+> ansible-playbook restart.yaml --limit us2 --ask-vault-pass
 
 # Available playbooks:
 - play.yaml - configure SPADS/verify SPADS is configured properly
@@ -62,36 +61,70 @@ Ansible Vault provides a way to encrypt sensitive information used by Ansible. I
 
 # Local testing
 
-It might be useful to test the playbook fully locally, and it's possible to do
-so in containers. Below we use podman rootless containers, but it should be
-analogous using docker.
+## Setup
 
-1. Build base image 
+We use LXD for local testing. Make sure you have it installed and initialized [following the docs](https://documentation.ubuntu.com/lxd/en/latest/). For example for Debian, it's as simple as `sudo apt install lxd && sudo lxd init`.
 
-   ```
-   podman build --build-arg=SSH_PUB_KEY="$(ssh-add -L | head -n 1)" \
-   -f testsrv.Dockerfile -t spads-testsrv
-   ```
+To create a new container and initialize it via cloud-init, run the following command:
 
-1. Start the container
+```
+touch .lxd-integration-on && \
+sudo lxc launch images:debian/bookworm/cloud spads-test1 < test.lxc.yml && \
+sudo lxc exec spads-test1 -- cloud-init status --wait
+```
 
-   ```
-   podman run --publish-all --detach --name spads spads-testsrv
-   ```
+This creates spads instance `TEST1`. You can create any number of them `TEST2`, `TEST3`, etc. by changing the name in the command above.
 
-   It can be later started/sroped/removed with standard podman commands.
+Then test that it works for ansible:
 
-1. Run playbook against the system running in container
+```
+ansible test1 -m shell -a 'uname -a'
+```
 
-   ```
-   ansible-playbook play.yaml -i localhost, \
-      --skip-tags container_incompatible \
-      -e ansible_ssh_port=$(podman port spads 22 | cut -d: -f2) \
-      -e ansible_user=root --ask-vault-pass
-   ```
+## Usage
 
-1. Connect to container
+### Run playbook
 
-   ```
-   ssh root@localhost -p $(podman port spads 22 | cut -d: -f2)
-   ```
+Now you can use all the playbooks and roles as usual, just make sure you are targeting the `dev` inventory group or individual `test1` host. For example:
+
+```
+ansible-playbook -l dev play.yaml
+```
+
+To override the lobby server temporarily from default `localhost` without modifying [dev.yaml](group_vars/dev.yaml) for test1:
+
+```
+ansible-playbook -l test1 -e "spads_lobbyHost=10.177.67.244" play.yaml
+```
+
+### Connect to the container
+
+To enter into container shell, run the following command:
+
+```
+sudo lxc exec spads-test1 -- /bin/bash
+```
+
+You can also ssh into it with something like:
+
+```
+ssh -i test.ssh.key ansible@$(ansible-inventory --host test1 | jq -r '.ansible_host')
+```
+
+### Register bot with teiserver
+
+You can register the spads lobby account with teiserver using the `register_bot.yaml` playbook:
+
+```
+ansible-playbook -l test1 register_bot.yaml
+```
+
+After that, you have to give the newly created account "Bot", "Verified" **and "Moderator"** roles manually in the teiserver web interface.
+
+## Cleanup
+
+To stop and remove the container:
+
+```
+sudo lxc stop spads-test1 && sudo lxc delete spads-test1
+```

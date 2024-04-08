@@ -5,7 +5,7 @@ Documentation=https://github.com/beyond-all-reason/maps-metadata/tree/main/tools
 [Service]
 Type=simple
 User={{ spads_username }}
-ExecStart=/usr/local/bin/map_syncer.py --log-level INFO --mqtt-host {{ mapSyncer_mqttBroker }} --healthcheck-url {{ mapSyncer_healthcheckUrl }} --delete-after 86400 {{ spads_install_path }}/var/spring/data/maps
+ExecStart=/usr/local/bin/map_syncer.py --log-level INFO --mqtt-host {{ mapSyncer_mqttBroker }} {% if mapSyncer_healthcheckUrl %}--healthcheck-url {{ mapSyncer_healthcheckUrl }} {% endif %}--delete-after 86400 {{ spads_install_path }}/var/spring/data/maps
 TimeoutStopSec=30
 Nice=10
 

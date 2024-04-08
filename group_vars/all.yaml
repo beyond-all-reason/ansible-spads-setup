@@ -30,6 +30,7 @@ package_dependencies:
   - lsof
   - make
   - mc
+  - netcat-openbsd
   - p7zip
   - p7zip-full
   - perl-doc
@@ -52,7 +53,7 @@ spads_lobbyHost:
 spads_channel:
 spads_baseGamePort: 53200
 spads_baseAutoHostPort: 53100
-spads_hostRegion: '"UNKNOWN - "'  # To be better defined in per group vars
+spads_hostRegion: '"UNKNOWN - "' # To be better defined in per group vars
 spads_enginesBaseDir: "{{ spads_install_path }}/var/spring/"
 spads_engineDir: "{{ engine_dir }}/"
 spads_springDataDir: "{{ spads_install_path }}/var/spring/data"

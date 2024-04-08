@@ -1,0 +1,17 @@
+---
+- name: Register bot account with teiserver
+  hosts: all
+  tasks:
+    - name: Register bot user with teiserver via lobby protocol
+      # This is like... super hacky... but it work and makes it quicker
+      # than going through the steps in the lobby client...
+      ansible.builtin.shell: |
+        PASS="$(python3 -c \
+          'import hashlib,base64,sys; print(base64.b64encode(hashlib.md5(sys.argv[1].encode()).digest()).decode())' \
+          {{ spads_lobbyPassword|quote }})"
+        echo "REGISTER {{ spads_lobbyLogin }} $PASS {{ spads_registrationEmail }}\nEXIT" \
+          | nc {{ spads_lobbyHost }} 8200
+      register: result
+    - name: Teiserver output
+      ansible.builtin.debug:
+        msg: "{{ result.stdout_lines }}"
