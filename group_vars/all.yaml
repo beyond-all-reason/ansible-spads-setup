@@ -44,6 +44,7 @@ package_dependencies:
   - tmux
   - ufw
   - wget
+  - xz-utils # for ansible's apt to be able to download and install from a :// url
 
 # the following are for spads_cluster_launcher.sh
 spads_lobbyLogin:
@@ -82,3 +83,5 @@ autoinstaller_lobbyPassword: changeme
 autoinstaller_owner: changeme
 
 mapSyncer_mqttBroker: broker.hivemq.com
+
+zabbix_repo_url: "https://repo.zabbix.com/zabbix/6.5/debian/pool/main/z/zabbix-release/zabbix-release_6.5-1+debian12_all.deb"

@@ -11,3 +11,4 @@ sftp_password: "invalid"
 checkmk_monitoring_enabled: false
 configure_swap: false
 mapSyncer_healthcheckUrl: null
+zabbix_psk: "fake_psk"

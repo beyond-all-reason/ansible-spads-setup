@@ -58,3 +58,10 @@
     path: /etc/hosts
     regexp: '^127\.0\.2\.1'
     line: '127.0.2.1 spads-{{ inventory_hostname }}'
+
+- name: Create {{ spads_install_path }}
+  ansible.builtin.file:
+    path: "{{ spads_install_path }}"
+    state: directory
+    owner: "{{ spads_username }}"
+    group: "{{ spads_username }}"

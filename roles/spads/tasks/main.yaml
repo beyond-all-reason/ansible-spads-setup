@@ -23,6 +23,10 @@
 - name: Install map_syncer
   ansible.builtin.import_tasks:
     file: map_syncer.yaml
+    
+- name: Setup Zabbix agent
+  ansible.builtin.import_tasks:
+    file: zabbix.yaml
 
 - name: Configure services
   ansible.builtin.import_tasks:
