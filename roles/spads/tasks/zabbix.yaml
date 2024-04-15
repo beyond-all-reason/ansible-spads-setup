@@ -23,6 +23,8 @@
   ansible.builtin.template:
     src: "zabbix_psk.j2"
     dest: "/etc/zabbix/main.psk"
+  no_log: true
+  diff: no
 
 - name: Start and enable Zabbix agent
   ansible.builtin.systemd:

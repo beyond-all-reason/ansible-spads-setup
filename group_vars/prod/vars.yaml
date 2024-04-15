@@ -18,3 +18,5 @@ spads_registrationEmail: "{{ vault_spads_registrationEmail }}"
 spads_lobbyHost: server4.beyondallreason.info
 
 mapSyncer_healthcheckUrl: https://hc-ping.com/{{ vault_healthchecksioPingKey }}/spads-{{ inventory_hostname }}-maps-sync
+
+zabbix_psk: "{{ vault_zabbix_psk }}"

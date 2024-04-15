@@ -27,6 +27,7 @@
 - name: Setup Zabbix agent
   ansible.builtin.import_tasks:
     file: zabbix.yaml
+  when: configure_zabbix_agent
 
 - name: Configure services
   ansible.builtin.import_tasks:
