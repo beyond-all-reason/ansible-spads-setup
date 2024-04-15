@@ -17,6 +17,7 @@
   ansible.builtin.template:
     src: "zabbix_agent.conf.j2"
     dest: "/etc/zabbix/zabbix_agent2.d/main.conf"
+  register: zabbix_config
 
 - name: Copy Zabbix psk
   ansible.builtin.template:
@@ -26,5 +27,6 @@
 - name: Start and enable Zabbix agent
   ansible.builtin.systemd:
     name: zabbix-agent2
-    state: started
+    state: restarted
     enabled: true
+  when: zabbix_config.changed
