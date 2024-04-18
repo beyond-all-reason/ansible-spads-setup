@@ -8,7 +8,7 @@ StartLimitBurst=3
 [Service]
 User={{ spads_username }}
 Type=oneshot
-ExecStart=python3 {{ spads_install_path }}/spads_config_bar/clear_logs_and_replays.py
+ExecStart=/usr/bin/python3 {{ spads_install_path }}/spads_config_bar/clear_logs_and_replays.py
 StandardOutput=journal
 Restart=on-failure
 RestartSec=5s
