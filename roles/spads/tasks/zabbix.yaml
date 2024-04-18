@@ -20,8 +20,8 @@
   register: zabbix_config
 
 - name: Copy Zabbix psk
-  ansible.builtin.template:
-    src: "zabbix_psk.j2"
+  ansible.builtin.copy:
+    content: "{{ zabbix_psk }}"
     dest: "/etc/zabbix/main.psk"
   no_log: true
   diff: no
