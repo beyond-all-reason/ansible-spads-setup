@@ -14,6 +14,7 @@
         - spring-setcpuaffinity.service
         - spads_config_updater.timer
         - map_syncer.service
+        - clear_spads_logs_and_replays.timer
 
     - name: Start and enable SPADS
       ansible.builtin.systemd:

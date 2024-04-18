@@ -1,0 +1,14 @@
+[Unit]
+Description=Clear SPADS logs and replays
+After=network.target
+
+StartLimitIntervalSec=600
+StartLimitBurst=3
+
+[Service]
+User={{ spads_username }}
+Type=oneshot
+ExecStart=perl {{ spads_install_path }}/spads_config_bar/clear_logs_and_replays.py
+StandardOutput=journal
+Restart=on-failure
+RestartSec=5s
