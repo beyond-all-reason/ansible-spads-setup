@@ -12,3 +12,5 @@ checkmk_monitoring_enabled: false
 configure_swap: false
 mapSyncer_healthcheckUrl: null
 zabbix_psk: "fake_psk"
+configure_zabbix_agent: false
+zabbix_server: 127.0.0.1
