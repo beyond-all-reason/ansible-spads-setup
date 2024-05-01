@@ -4,7 +4,7 @@ eu2 ansible_host=135.125.190.148 ansible_user=debian
 # also hosts bar repos
 eu3 ansible_host=135.125.232.13 ansible_user=debian
 eu4 ansible_host=176.57.150.243 ansible_user=debian
-eu5 ansible_host=45.85.250.178 ansible_user=debian
+eu5 ansible_host=209.182.239.128 ansible_user=debian
 eu6 ansible_host=153.92.127.27 ansible_user=debian
 us1 ansible_host=135.148.139.38 ansible_user=debian
 us2 ansible_host=192.210.162.137 ansible_user=debian
