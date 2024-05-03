@@ -13,6 +13,10 @@ swap_size: 4096
 swap_file: /var/swap.img
 swap_swappiness: '10'
 
+spads_hostRegion: '"{{inventory_hostname | upper}} - "'
+spads_lobbyLogin: 'Host[{{inventory_hostname | upper}}]'
+spads_channel: Host{{inventory_hostname | upper}}
+
 spads_lobbyPassword: "{{ vault_spads_lobbyPassword }}"
 spads_registrationEmail: "{{ vault_spads_registrationEmail }}"
 spads_lobbyHost: server4.beyondallreason.info

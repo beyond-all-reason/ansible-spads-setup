@@ -1,6 +1,3 @@
-spads_hostRegion: '"EU3 - "'
-spads_lobbyLogin: 'Host[EU3]'
-spads_channel: clusterEU3
 spads_maxInstances: 25
 # For rapid hosting
 ufw_additional_profiles:
