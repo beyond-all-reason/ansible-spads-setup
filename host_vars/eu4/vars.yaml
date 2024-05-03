@@ -1,5 +1,5 @@
 spads_hostRegion: '"EU4 - "'
-spads_lobbyLogin: '[teh]clusterEU4'
+spads_lobbyLogin: 'Host[EU4]'
 spads_channel: clusterEU4
 spads_baseGamePort: 53300
 spads_maxInstances: 150

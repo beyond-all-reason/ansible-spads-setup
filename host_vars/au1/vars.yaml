@@ -1,4 +1,4 @@
-spads_hostRegion: '"AU - "'
-spads_lobbyLogin: '[teh]clusterAU'
+spads_hostRegion: '"AU1 - "'
+spads_lobbyLogin: 'Host[AU1]'
 spads_channel: clusterAU1
 spads_maxInstances: 80

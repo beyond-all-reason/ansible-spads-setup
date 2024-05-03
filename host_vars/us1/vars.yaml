@@ -1,4 +1,4 @@
-spads_hostRegion: '"US -"'
-spads_lobbyLogin: '[teh]clusterUS'
+spads_hostRegion: '"US1 -"'
+spads_lobbyLogin: 'Host[US1]'
 spads_channel: clusterUS1
 spads_maxInstances: 80

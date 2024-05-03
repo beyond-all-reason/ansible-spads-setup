@@ -1,5 +1,5 @@
-spads_hostRegion: '"EU - 3"'
-spads_lobbyLogin: '[teh]clusterEU3'
+spads_hostRegion: '"EU3 - "'
+spads_lobbyLogin: 'Host[EU3]'
 spads_channel: clusterEU3
 spads_maxInstances: 25
 # For rapid hosting
