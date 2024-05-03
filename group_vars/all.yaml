@@ -53,7 +53,7 @@ spads_registrationEmail:
 spads_lobbyHost:
 spads_channel:
 spads_baseGamePort: 53200
-spads_baseAutoHostPort: 53100
+spads_baseAutoHostPort: 54200 # Put these 1000 higher up, as they are internal ports only anyway
 spads_hostRegion: '"UNKNOWN - "' # To be better defined in per group vars
 spads_enginesBaseDir: "{{ spads_install_path }}/var/spring/"
 spads_engineDir: "{{ engine_dir }}/"
