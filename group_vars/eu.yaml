@@ -1,1 +1,1 @@
-spads_hostRegion: '"EU - "'
+spads_hostRegion: '"{{inventory_hostname | upper}} -"'
