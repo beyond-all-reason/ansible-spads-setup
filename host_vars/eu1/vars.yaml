@@ -1,3 +1,1 @@
-spads_maxInstances: 80
-# this instance is a LXD container running in system with swap
-configure_swap: false
+spads_maxInstances: 150
