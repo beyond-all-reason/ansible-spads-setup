@@ -1,4 +1,6 @@
 au1 ansible_host=154.26.155.238 ansible_user=debian
+au2 ansible_host=139.99.194.68 ansible_user=debian
+
 eu1 ansible_host=208.87.129.159 ansible_user=debian
 eu2 ansible_host=135.125.190.148 ansible_user=debian
 # also hosts bar repos
@@ -6,6 +8,7 @@ eu3 ansible_host=135.125.232.13 ansible_user=debian
 eu4 ansible_host=176.57.150.243 ansible_user=debian
 eu5 ansible_host=209.182.239.128 ansible_user=debian
 eu6 ansible_host=153.92.127.27 ansible_user=debian
+
 us1 ansible_host=135.148.139.38 ansible_user=debian
 us2 ansible_host=192.210.162.137 ansible_user=debian
 us3 ansible_host=207.244.249.133 ansible_user=debian
@@ -14,6 +17,7 @@ us4 ansible_host=144.126.147.151 ansible_user=debian
 # add each server to the matching region below
 [au]
 au1
+au2
 
 [eu]
 eu[1:6]
