@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# This script generates Ansible dev inventory from LXD containers named spads-testN
+# This script generates Ansible dev inventory from Incus containers named spads-testN
 
 import grp
 import json
@@ -9,14 +9,6 @@ import os.path
 import re
 import shutil
 import subprocess
-import sys
-
-def has_permission_to_lxd():
-    if os.geteuid() == 0:
-        return True
-    if 'lxd' not in grp.getgrall():
-        return False
-    return grp.getgrnam('lxd').gr_gid in os.getgroups()
 
 def get_container_ip(container):
     for interface, info in container['state']['network'].items():
@@ -28,15 +20,13 @@ def get_container_ip(container):
     return None
 
 def get_hosts():
-    if not os.path.isfile('.lxd-integration-on'):
+    if not os.path.isfile('.incus-integration-on'):
         return {}
-    if shutil.which('lxc') is None:
+    if shutil.which('incus') is None:
         return {}
-    if not has_permission_to_lxd():
-        os.execv('/usr/bin/sudo', ['sudo'] + sys.argv)
 
     containers = json.loads(subprocess.check_output(
-        ['lxc', 'list', '--format=json', 'status=running', 'spads-test']))
+        ['incus', 'list', '--format=json', 'status=running', 'spads-test']))
 
     hosts = {}
     for container in containers:

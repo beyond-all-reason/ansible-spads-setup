@@ -63,14 +63,15 @@ Ansible Vault provides a way to encrypt sensitive information used by Ansible. I
 
 ## Setup
 
-We use LXD for local testing. Make sure you have it installed and initialized [following the docs](https://documentation.ubuntu.com/lxd/en/latest/). For example for Debian, it's as simple as `sudo apt install lxd && sudo lxd init`.
+We use Incus for local testing. Make sure you have it installed and initialized following [the official getting started docs](https://linuxcontainers.org/incus/docs/main/tutorial/first_steps/).
 
 To create a new container and initialize it via cloud-init, run the following command:
 
 ```
-touch .lxd-integration-on && \
-sudo lxc launch images:debian/bookworm/cloud spads-test1 < test.lxc.yml && \
-sudo lxc exec spads-test1 -- cloud-init status --wait
+touch .incus-integration-on && \
+chmod 0600 test.ssh.key && \
+incus launch images:debian/bookworm/cloud spads-test1 < test.incus.yml && \
+incus exec spads-test1 -- cloud-init status --wait
 ```
 
 This creates spads instance `TEST1`. You can create any number of them `TEST2`, `TEST3`, etc. by changing the name in the command above.
@@ -102,7 +103,7 @@ ansible-playbook -l test1 -e "spads_lobbyHost=10.177.67.244" play.yaml
 To enter into container shell, run the following command:
 
 ```
-sudo lxc exec spads-test1 -- /bin/bash
+incus exec spads-test1 -- /bin/bash
 ```
 
 You can also ssh into it with something like:
@@ -126,5 +127,5 @@ After that, you have to give the newly created account "Bot", "Verified" **and "
 To stop and remove the container:
 
 ```
-sudo lxc stop spads-test1 && sudo lxc delete spads-test1
+incus stop spads-test1 && incus delete spads-test1
 ```
