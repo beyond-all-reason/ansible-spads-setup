@@ -1,0 +1,11 @@
+---
+- name: Config Update for SPADS
+  hosts: all
+  become: yes
+  become_user: spads
+  tasks:
+    - name: Launch config updater manually
+      ansible.builtin.shell: |
+        cd /home/spads/spads/spads_config_bar && python3 spads_config_bar_updater.py -s
+      args:
+        chdir: /home/spads/spads/spads_config_bar/
