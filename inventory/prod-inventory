@@ -16,6 +16,9 @@ us2 ansible_host=192.210.162.137 ansible_user=debian
 us3 ansible_host=207.244.249.133 ansible_user=debian
 us4 ansible_host=144.126.147.151 ansible_user=debian
 
+#East Asia
+ea1 ansible_host=103.73.67.214 ansible_user=debian
+
 # add each server to the matching region below
 [au]
 au1
@@ -27,7 +30,11 @@ eu[1:7]
 [us]
 us[1:4]
 
+[ea]
+ea1
+
 [prod:children]
 au
 eu
 us
+ea
