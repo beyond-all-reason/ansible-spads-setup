@@ -1,0 +1,66 @@
+---
+- name: Extract and upload spads logs from multiple servers
+  hosts: all
+  become: true
+  vars:
+    start_time: "{{ start_time }}"
+    end_time: "{{ end_time }}"
+  tasks:
+
+    - name: Switch to spads user and find spads.log files
+      become_user: spads
+      find:
+        paths: "/home/spads/spads/var/ClusterManager/"
+        patterns: "spads.log"
+        recurse: yes
+      register: log_files
+
+    - name: Ensure log path includes Host[region][id]
+      set_fact:
+        # log_files_with_host: "{{ log_files.files | map(attribute='path') | map('regex_search', '/Host\\[.*\\]\\[.*\\]') | zip(log_files.files) | selectattr('0', 'defined') | map('last') | list }}"
+        log_files_with_host: "{{ log_files.files | map(attribute='path') | map('regex_search', '/Host\\[.*\\]\\[.*\\]') | zip(log_files.files) | selectattr('0', 'defined') | map('last') | list }}"
+
+
+    - name: Extract log entries between timestamps
+      shell: | 
+        awk -v d1="{{ start_time }}" -v d2="{{ end_time }}" '($1) >= d1 && ($1) <= d2' {{ item.path }} > /tmp/[{{ start_time }}]_[{{ end_time }}]_{{ item.path | regex_search('Host\[.*\]\[.*\]') }}_spads.log
+        #awk '/^{{ start_time }} -/,/^{{ end_time }} -/' {{ item.path }} > /tmp/[{{ start_time }}]_[{{ end_time }}]_{{ item.path | regex_search('Host\[.*\]\[.*\]') }}_spads.log
+        #awk '/^{{ start_time }} -/,/^{{ end_time }} -/' {{ item.path }} > /tmp/[{{ start_time }}]_[{{ end_time }}]_{{ item.path  }}_spads.log
+      args:
+        executable: /bin/bash
+      loop: "{{ log_files_with_host }}"
+      register: extracted_logs
+
+    - name: Get file size of extracted logs
+      stat:
+        path: "/tmp/[{{ start_time }}]_[{{ end_time }}]_{{ item.path | regex_search('Host\\[.*\\]\\[.*\\]') }}_spads.log"
+      loop: "{{ log_files_with_host }}"
+      register: log_file_stats
+
+    - name: Print size of filtered log files
+      debug:
+        msg: "File: /tmp/[{{ start_time }}]_[{{ end_time }}]_{{ item.item.path | regex_search('Host\\[.*\\]\\[.*\\]') }}_spads.log has size: {{ item.stat.size }} bytes"
+      loop: "{{ log_file_stats.results }}"
+      when: item.stat.exists
+
+    - name: Create local directory for log uploads
+      file:
+        path: "./logs"
+        state: directory
+      delegate_to: localhost
+      become: false  # Ensure no sudo is used on localhost
+
+    - name: Upload extracted logs to control node
+      fetch:
+        src: "/tmp/[{{ start_time }}]_[{{ end_time }}]_{{ item.path | regex_search('Host\\[.*\\]\\[.*\\]') }}_spads.log"
+        dest: "./logs/"
+        flat: yes
+      loop: "{{ log_files_with_host }}"
+      #become: false  # Ensure no sudo is used on localhost
+
+    - name: Clean up temporary files
+      become_user: spads
+      file:
+        path: "/tmp/[{{ start_time }}]_[{{ end_time }}]_{{ item.path | regex_search('/Host\\[.*\\]\\[.*\\]') }}spads.log"
+        state: absent
+      loop: "{{ log_files_with_host }}"
