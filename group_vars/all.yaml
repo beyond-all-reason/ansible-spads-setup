@@ -9,9 +9,9 @@ allow_delete: false
 
 # Important: The URL's for engine releases contain %7B characters for brackets. It seems that wget does not always like these, so replace with {}
 # Note that these characters get replaced with '.' characters for the engine_dir
-engine_version_base: 2590-gb9462a0
-engine_github_path: https://github.com/beyond-all-reason/spring/releases/download/spring_bar_{BAR105}105.1.1-2590-gb9462a0/spring_bar_.BAR105.105.1.1-2590-gb9462a0_linux-64-minimal-portable.7z
-engine_dir: spring_bar_.BAR105.105.1.1-2590-gb9462a0_linux-64-minimal-portable
+engine_version_base: rel2501.2025.01.06
+engine_github_path: https://github.com/beyond-all-reason/spring/releases/download/2025.01.6/spring_bar_.rel2501.2025.01.6_linux-64-minimal-portable.7z
+engine_dir: rel2501.2025.01.06
 
 # allows to enable additonal services on the per-host basis
 ufw_additional_profiles: []
