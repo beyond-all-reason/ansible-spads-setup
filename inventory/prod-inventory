@@ -6,7 +6,6 @@ eu2 ansible_host=185.175.59.135 ansible_user=debian
 # also hosts bar repos
 eu3 ansible_host=135.125.232.13 ansible_user=debian
 eu4 ansible_host=176.57.150.243 ansible_user=debian
-eu5 ansible_host=209.182.239.128 ansible_user=debian
 eu6 ansible_host=153.92.127.27 ansible_user=debian
 #also hosts integration server:
 eu7 ansible_host=31.187.64.19 ansible_user=debian
