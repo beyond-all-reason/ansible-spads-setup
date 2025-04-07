@@ -16,6 +16,7 @@ us1 ansible_host=109.205.61.148 ansible_user=debian
 us2 ansible_host=192.210.162.137 ansible_user=debian
 us3 ansible_host=207.244.249.133 ansible_user=debian
 us4 ansible_host=144.126.147.151 ansible_user=debian
+us5 ansible_host=45.45.216.125 ansible_user=debian
 
 #East Asia
 ea1 ansible_host=103.73.67.214 ansible_user=debian
@@ -30,7 +31,7 @@ eu[1:4]
 eu[6:8]
 
 [us]
-us[1:4]
+us[1:5]
 
 [ea]
 ea1
