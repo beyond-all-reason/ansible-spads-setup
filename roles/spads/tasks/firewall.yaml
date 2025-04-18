@@ -14,18 +14,6 @@
     rule: allow
     name: SPADS
 
-- name: Drop checkmk agent ports
-  community.general.ufw:
-    rule: limit
-    name: Checkmk Agent
-    delete: true
-
-- name: Remove checkmk ufw config
-  ansible.builtin.file:
-    path: "/etc/ufw/applications.d/checkmk"
-    state: absent
-  notify: "Reload ufw profile configs"
-
 - name: Allow ports for additional services
   community.general.ufw:
     rule: allow
