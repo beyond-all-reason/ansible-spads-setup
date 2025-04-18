@@ -2,11 +2,14 @@
 - name: Initial config
   ansible.builtin.import_tasks:
     file: initialSetup.yaml
+  tags: initial_setup
 
 - name: Configure firewall
   ansible.builtin.import_tasks:
     file: firewall.yaml
-  tags: container_incompatible
+  tags:
+  - container_incompatible
+  - firewall
 
 - name: Configure swap
   ansible.builtin.import_tasks:
@@ -19,6 +22,7 @@
   become_user: "{{ spads_username }}"
   ansible.builtin.import_tasks:
     file: installSPADS.yaml
+  tags: spads
 
 - name: Install map_syncer
   ansible.builtin.import_tasks:
@@ -32,3 +36,4 @@
 - name: Configure services
   ansible.builtin.import_tasks:
     file: services.yaml
+  tags: services
