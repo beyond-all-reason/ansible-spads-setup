@@ -23,16 +23,6 @@
     src: "spads_config_updater.timer.j2"
     dest: "/etc/systemd/system/spads_config_updater.timer"
 
-- name: Copy clear_spads_logs_and_replays service template file to remote host
-  ansible.builtin.template:
-    src: "clear_logs_and_replays.service.j2"
-    dest: "/etc/systemd/system/clear_spads_logs_and_replays.service"
-
-- name: Copy clear_spads_logs_and_replays timer template file to remote host
-  ansible.builtin.template:
-    src: "clear_logs_and_replays.timer.j2"
-    dest: "/etc/systemd/system/clear_spads_logs_and_replays.timer"
-
 - name: Copy spring-setcpuaffinity service template file to remote host
   ansible.builtin.template:
     src: "spring-setcpuaffinity.service.j2"
