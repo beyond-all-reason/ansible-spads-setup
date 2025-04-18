@@ -1,0 +1,32 @@
+{{ spads_install_path }}/var/ClusterManager/*/log/*.log {{ spads_install_path }}/var/ClusterManager/*/log/chat/battle.log {{ spads_install_path }}/var/ClusterManager/*/log/chat/game.log {{ spads_install_path }}/var/log/*.log {
+    daily
+    su {{ spads_username }} {{ spads_username }}
+    missingok
+    ifempty
+    rotate 10
+    copytruncate
+    compress
+    compresscmd /usr/bin/zstd
+    compressext .zst
+    compressoptions -9 --long
+    uncompresscmd /usr/bin/unzstd
+}
+
+{{ spads_install_path }}/var/log/chat/pv_*.log {{ spads_install_path }}/var/ClusterManager/*/log/chat/pv_*.log {
+    weekly
+    minsize 100k
+    su {{ spads_username }} {{ spads_username }}
+    missingok
+    rotate 1
+    copytruncate
+    maxage 10
+    compress
+    compresscmd /usr/bin/zstd
+    compressext .zst
+    compressoptions -9 --long
+    uncompresscmd /usr/bin/unzstd
+    sharedscripts
+    prerotate
+        find {{ spads_install_path }}/var/ -name 'pv_*.log' -mtime +14 -delete
+    endscript
+}

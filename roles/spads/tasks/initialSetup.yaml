@@ -65,3 +65,8 @@
     state: directory
     owner: "{{ spads_username }}"
     group: "{{ spads_username }}"
+
+- name: Configure logrotate for spads logs
+  ansible.builtin.template:
+    src: "spads-logrotate.j2"
+    dest: "/etc/logrotate.d/spads"

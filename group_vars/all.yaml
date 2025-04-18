@@ -26,6 +26,7 @@ package_dependencies:
   - libdbd-sqlite3-perl
   - libffi-platypus-perl
   - locate
+  - logrotate
   - lsof
   - make
   - mc
@@ -44,6 +45,7 @@ package_dependencies:
   - ufw
   - wget
   - xz-utils # for ansible's apt to be able to download and install from a :// url
+  - zstd
 
 # the following are for spads_cluster_launcher.sh
 spads_lobbyLogin:
