@@ -61,8 +61,8 @@ spads_endGameCommandPath: "{{ spads_install_path }}/upload_replay.sh"
 spads_localLanIp: 192.168.1.102
 spads_maxInstances: 99
 spads_targetSpares: 1
-spads_clusters:
-spads_hostIp:
+spads_clusters: ''
+spads_hostIp: ''
 spads_autoLoadPlugins: '"AutoRegister;ClusterManager;JsonStatus;InGameMute;DynamicMapRotation;BarManager;RatingManager"'
 
 # the following are for spadsInstaller.auto
