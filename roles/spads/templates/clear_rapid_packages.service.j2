@@ -1,0 +1,8 @@
+[Unit]
+Description=Clear old rapid packages
+
+[Service]
+User={{ spads_username }}
+Type=oneshot
+ExecStart=perl {{ spads_install_path }}/sequentialSpadsUnitsyncProcess.pl {{ spads_install_path }}/var {{ spads_install_path }}/clear_rapid_packages.sh {{ spads_install_path }}/var/spring/data/packages 20
+Nice=10

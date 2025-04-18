@@ -1,0 +1,9 @@
+[Unit]
+Description=Clear old replays
+
+[Service]
+User={{ spads_username }}
+Type=oneshot
+# Make sure that we have at least 5 GiB (5242880 KiB) of storage left
+ExecStart={{ spads_install_path }}/clear_replays.sh {{ spads_install_path }}/var/ClusterManager 5242880
+Nice=10

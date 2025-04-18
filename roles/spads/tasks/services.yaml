@@ -1,37 +1,31 @@
-- name: Copy pr-downloader service template file to remote host
-  ansible.builtin.template:
-    src: "pr-downloader.service.j2"
-    dest: "/etc/systemd/system/pr-downloader.service"
+- name: Install scripts
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ spads_install_path }}/{{ item }}"
+    mode: "0755"
+    owner: spads
+    group: spads
+  with_items:
+    - clear_rapid_packages.sh
+    - clear_replays.sh
 
-- name: Copy pr-downloader timer template file to remote host
+- name: Install systemd service
   ansible.builtin.template:
-    src: "pr-downloader.timer.j2"
-    dest: "/etc/systemd/system/pr-downloader.timer"
-
-- name: Copy map_syncer service template file to remote host
-  ansible.builtin.template:
-    src: "map_syncer.service.j2"
-    dest: "/etc/systemd/system/map_syncer.service"
-
-- name: Copy spads_config_updater service template file to remote host
-  ansible.builtin.template:
-    src: "spads_config_updater.service.j2"
-    dest: "/etc/systemd/system/spads_config_updater.service"
-
-- name: Copy spads_config_updater timer template file to remote host
-  ansible.builtin.template:
-    src: "spads_config_updater.timer.j2"
-    dest: "/etc/systemd/system/spads_config_updater.timer"
-
-- name: Copy spring-setcpuaffinity service template file to remote host
-  ansible.builtin.template:
-    src: "spring-setcpuaffinity.service.j2"
-    dest: "/etc/systemd/system/spring-setcpuaffinity.service"
-
-- name: Copy SPADS service template file to remote host
-  ansible.builtin.template:
-    src: "spads.service.j2"
-    dest: "/etc/systemd/system/spads.service"
+    src: "{{ item }}.j2"
+    dest: "/etc/systemd/system/{{ item }}"
+    mode: "0644"
+  with_items:
+    - pr-downloader.service
+    - pr-downloader.timer
+    - map_syncer.service
+    - spads_config_updater.service
+    - spads_config_updater.timer
+    - spring-setcpuaffinity.service
+    - spads.service
+    - clear_rapid_packages.service
+    - clear_rapid_packages.timer
+    - clear_replays.service
+    - clear_replays.timer
 
 - name: Force systemd to reread configs
   ansible.builtin.systemd:

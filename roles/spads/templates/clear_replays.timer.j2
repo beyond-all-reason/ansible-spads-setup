@@ -1,0 +1,9 @@
+[Unit]
+Description=Clear old replays every 4h
+
+[Timer]
+OnCalendar=0/4:00
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

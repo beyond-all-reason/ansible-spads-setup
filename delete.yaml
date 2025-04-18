@@ -17,6 +17,10 @@
         - map_syncer.service
         - spads_config_updater.service
         - spads_config_updater.timer
+        - clear_rapid_packages.service
+        - clear_rapid_packages.timer
+        - clear_replays.service
+        - clear_replays.timer
 
     - name: Delete SPADS files and services
       ansible.builtin.file:
@@ -30,3 +34,7 @@
         - /etc/systemd/system/map_syncer.service
         - /etc/systemd/system/spads_config_updater.service
         - /etc/systemd/system/spads_config_updater.timer
+        - /etc/systemd/system/clear_rapid_packages.service
+        - /etc/systemd/system/clear_rapid_packages.timer
+        - /etc/systemd/system/clear_replays.service
+        - /etc/systemd/system/clear_replays.timer

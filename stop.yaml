@@ -16,6 +16,8 @@
         - spring-setcpuaffinity.service
         - spads_config_updater.service
         - map_syncer.service
+        - clear_rapid_packages.timer
+        - clear_replays.timer
 
     - name: Stop and disable SPADS
       ansible.builtin.systemd:
