@@ -70,3 +70,20 @@
   ansible.builtin.template:
     src: "spads-logrotate.j2"
     dest: "/etc/logrotate.d/spads"
+
+- name: Ensure journald.conf.d/ exists
+  ansible.builtin.file:
+    state: directory
+    path: /etc/systemd/journald.conf.d/
+
+- name: Configure max journald.conf.d size
+  ansible.builtin.copy:
+    src: journald-size-control.conf
+    dest: /etc/systemd/journald.conf.d/99-size-control.conf
+  register: journald_config
+
+- name: Restart journald service to pick up changes
+  ansible.builtin.systemd:
+    name: systemd-journald.service
+    state: restarted
+  when: journald_config.changed
