@@ -5,21 +5,31 @@
     get_mime: no
   register: swap_file_check
 
-- name: Create swap file
-  become: yes
-  ansible.builtin.file:
-    state: touch
-    path: "{{ swap_file }}"
-  when: not swap_file_check.stat.exists
+- name: Get current swap file size
+  ansible.builtin.command: du -m {{ swap_file }}
+  register: swap_file_size
+  when: swap_file_check.stat.exists
+  changed_when: false
 
-- name: Create swap space
+- name: Parse current swap file size
+  set_fact:
+    current_swap_size: "{{ swap_file_size.stdout.split()[0] | int }}"
+  when: swap_file_check.stat.exists
+
+- name: Turn off swap if size is not equal to desired
+  become: yes
+  ansible.builtin.command: swapoff {{ swap_file }}
+  when: swap_file_check.stat.exists and current_swap_size != swap_size
+
+- name: Create or resize swap file
+  become: yes
   ansible.builtin.command: dd if=/dev/zero of={{ swap_file }} bs=1M count={{ swap_size }}
-  when: not swap_file_check.stat.exists
+  when: not swap_file_check.stat.exists or (swap_file_check.stat.exists and current_swap_size != swap_size)
 
 - name: Format swap file
   become: yes
   ansible.builtin.command: mkswap {{ swap_file }}
-  when: not swap_file_check.stat.exists
+  when: not swap_file_check.stat.exists or (swap_file_check.stat.exists and current_swap_size != swap_size)
 
 - name: Set permissions on swap file
   become: yes
