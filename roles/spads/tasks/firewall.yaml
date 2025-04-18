@@ -14,18 +14,17 @@
     rule: allow
     name: SPADS
 
-- name: Install checkmk ufw config
-  ansible.builtin.template:
-    src: "ufw.checkmk.j2"
-    dest: "/etc/ufw/applications.d/checkmk"
-  when: checkmk_monitoring_enabled == true
-  notify: "Reload ufw profile configs"
-
-- name: Allow checkmk agent ports
+- name: Drop checkmk agent ports
   community.general.ufw:
     rule: limit
     name: Checkmk Agent
-  when: checkmk_monitoring_enabled == true
+    delete: true
+
+- name: Remove checkmk ufw config
+  ansible.builtin.file:
+    path: "/etc/ufw/applications.d/checkmk"
+    state: absent
+  notify: "Reload ufw profile configs"
 
 - name: Allow ports for additional services
   community.general.ufw:

@@ -3,10 +3,6 @@ spads_user_password: "{{ vault_spads_user_password }}"
 sftp_login: "{{ vault_sftp_login }}"
 sftp_password: "{{ vault_sftp_password }}"
 
-# allows system monitoring, currently with checkmk
-checkmk_monitoring_enabled: true
-checkmk_monitoring_port: 6556
-
 # swap size in megabytes
 configure_swap: yes
 swap_size: 4096

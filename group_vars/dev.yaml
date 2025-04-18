@@ -8,7 +8,6 @@ spads_channel: "cluster{{ inventory_hostname | upper }}"
 spads_maxInstances: 20
 sftp_login: "invalid"
 sftp_password: "invalid"
-checkmk_monitoring_enabled: false
 configure_swap: false
 mapSyncer_healthcheckUrl: null
 zabbix_psk: "fake_psk"
