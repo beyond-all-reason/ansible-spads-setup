@@ -25,6 +25,7 @@ package_dependencies:
   - htop
   - libdbd-sqlite3-perl
   - libffi-platypus-perl
+  - libinline-python-perl
   - locate
   - logrotate
   - lsof
@@ -36,7 +37,6 @@ package_dependencies:
   - perl-doc
   - procps
   - python3-dev
-  - python3-distutils
   - screen
   - sshpass
   - sudo

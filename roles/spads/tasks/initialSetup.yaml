@@ -35,26 +35,6 @@
     password: "{{ spads_user_password }}"
     append: yes
 
-- name: Check if Inline::Python is installed (fails are permitted)
-  ansible.builtin.shell:
-    cmd: sh /usr/bin/perldoc perllocal | grep Inline::Python
-  ignore_errors: true
-  register: result
-  changed_when: false
-
-- debug: var=result.stdout_lines
-
-- name: Run "cpanm https://github.com/niner/inline-python-pm.git"
-  ansible.builtin.command:
-    cmd: "cpanm https://github.com/niner/inline-python-pm.git"
-  register: out
-  when: result is failed
-
-- debug: var=out.stdout_lines
-  when: result is failed
-
-- debug: var=out.stdout_lines
-
 - name: Set hostname
   ansible.builtin.hostname:
     name: "spads-{{ inventory_hostname }}"
