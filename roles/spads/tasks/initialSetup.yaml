@@ -16,6 +16,13 @@
   community.general.timezone:
     name: Etc/UTC
 
+- name: Set ssh ClientAliveInterval
+  ansible.builtin.copy:
+    content: |
+      ClientAliveInterval 120
+    dest: /etc/ssh/sshd_config.d/91-client-alive.conf
+    mode: 0600
+
 - name: Install required packages
   ansible.builtin.package:
     pkg: "{{ package_dependencies }}"
