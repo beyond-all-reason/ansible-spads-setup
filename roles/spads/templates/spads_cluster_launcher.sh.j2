@@ -82,8 +82,8 @@ inactive_stop_timeout=60
 
 reload=false
 
-trap 'reload=true; kill $manager_pid;' SIGHUP
-trap 'kill $manager_pid;' SIGINT SIGTERM
+trap 'script_interrupted=true; reload=true; kill $manager_pid;' SIGHUP
+trap 'script_interrupted=true; kill $manager_pid;' SIGINT SIGTERM
 
 # Helper function for executing pkill,pidwait,pgrep for all processes
 # in the same cgroup as the current process. Each systemd service has
@@ -113,12 +113,16 @@ systemd-notify --ready --status="SPADS started"
 ) &
 status_loop_pid=$!
 
-# wait returns exit code > 128 if it was interrupted by a signal, so we wrap
-# it in a loop
-manager_exit_code=129
-while (( $manager_exit_code > 128 )); do
+# The trap sets script_interrupted=true so that we know when to continue waiting
+script_interrupted=true
+while [[ $script_interrupted = true ]]; do
+	script_interrupted=false
 	wait $manager_pid
 	manager_exit_code=$?
+	# If it was SIGTERM, that's WAI
+	if (( manager_exit_code == 143 )); then
+		manager_exit_code=0
+	fi
 done
 
 kill $status_loop_pid
