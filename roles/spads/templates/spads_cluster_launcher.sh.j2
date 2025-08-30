@@ -83,7 +83,7 @@ inactive_stop_timeout=60
 reload=false
 
 trap 'script_interrupted=true; reload=true; kill $manager_pid;' SIGHUP
-trap 'script_interrupted=true; kill $manager_pid;' SIGINT SIGTERM
+trap 'script_interrupted=true; reload=false; kill $manager_pid;' SIGINT SIGTERM
 
 # Helper function for executing pkill,pidwait,pgrep for all processes
 # in the same cgroup as the current process. Each systemd service has
@@ -128,34 +128,34 @@ done
 kill $status_loop_pid
 wait $status_loop_pid
 
-if [[ $reload = true ]]; then
-	if (( $manager_exit_code != 0 )); then
-		exit $manager_exit_code
-	fi
-
+if [[ $reload = true ]] && (( $manager_exit_code == 0 )); then
 	systemd-notify --status="Waiting $inactive_stop_timeout seconds for inactive instances to stop..."
 	sleep $(( $inactive_stop_timeout + 5 ))
 
-	# TODO: for Type=notify-reload, --reloading arg available only since systemd v253
-	systemd-notify --status="Restarting SPADS manager..."
-	exec "$0"
-else
-	# TODO: for Type=notify-reload, --stopping arg available only since systemd v253
-	systemd-notify --status="Waiting for room SPADS instances to exit..."
-	child_ pkill $spads_instance_pattern
-
-	# TODO: pidwait is broken on Debian 11... https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1006395
-	#       so we do manual loop over proc...
-	# child_ pidwait $spads_instance_pattern
-
-	for pid in $(child_ pgrep $spads_instance_pattern); do
-		while [[ -f /proc/$pid/comm ]]; do
-			sleep 1
-		done
-	done
-
-	systemd-notify --status="Exiting"
-	exit $manager_exit_code
+	# Double check that we want to reload, not stop, after sleep
+	if [[ $reload = true ]]; then
+		# TODO: for Type=notify-reload, --reloading arg available only since systemd v253
+		systemd-notify --status="Restarting SPADS manager..."
+		exec "$0"
+	fi
 fi
+
+# TODO: for Type=notify-reload, --stopping arg available only since systemd v253
+systemd-notify --status="Waiting for room SPADS instances to exit..."
+child_ pkill $spads_instance_pattern
+
+# TODO: pidwait is broken on Debian 11... https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1006395
+#       so we do manual loop over proc...
+# child_ pidwait $spads_instance_pattern
+
+for pid in $(child_ pgrep $spads_instance_pattern); do
+	while [[ -f /proc/$pid/comm ]]; do
+		sleep 1
+	done
+done
+
+systemd-notify --status="Exiting"
+exit $manager_exit_code
+
 
 }
