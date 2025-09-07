@@ -16,33 +16,28 @@ engine_dir: recoil_2025.04.08_amd64-linux
 ufw_additional_profiles: []
 
 package_dependencies:
+  - 7zip
   - acl
   - byobu
-  - cpanminus
   - curl
-  - g++
   - git
   - htop
   - libdbd-sqlite3-perl
   - libffi-platypus-perl
   - libinline-python-perl
-  - locate
   - logrotate
   - lsof
-  - make
   - mc
   - netcat-openbsd
-  - p7zip
-  - p7zip-full
-  - perl-doc
+  - plocate
   - procps
-  - python3-dev
   - screen
   - sshpass
   - sudo
   - swig
   - tmux
   - ufw
+  - unattended-upgrades
   - wget
   - xz-utils # for ansible's apt to be able to download and install from a :// url
   - zstd
