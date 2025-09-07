@@ -3,7 +3,7 @@ Description=Spring Perl Autohost Dedicated Server
 After=network.target
 
 [Service]
-Type=notify
+Type=notify-reload
 NotifyAccess=all
 KillMode=mixed
 TimeoutStopSec=2h
@@ -13,8 +13,6 @@ User={{ spads_username }}
 WorkingDirectory={{ spads_install_path }}/etc
 EnvironmentFile={{ spads_install_path }}/secrets.env
 ExecStart={{ spads_install_path }}/etc/spads_cluster_launcher.sh
-# TODO: Type=notify-reload is available only since systemd v253 :(
-ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]
 WantedBy=multi-user.target

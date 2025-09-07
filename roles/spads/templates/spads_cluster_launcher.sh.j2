@@ -67,8 +67,9 @@ perl ../spads.pl spads_cluster.conf \
 
 # The section below handles the spads manager process when running as a systemd
 # service. We handle:
-#   - SIGHUP: reloads SPADS by just restarting the manager and not touching
-#     the invividual rooms.
+#   - SIGHUP: reloads SPADS by restarting the manager and signalling child
+#     instances to terminate to pick up new configuration. It's like restart, but
+#     without waiting for all instances to quite before starting manager again.
 #   - SIGINT and SIGTERM: it sends SIGTERM to manager and all the rooms. Then it
 #     waits for all of them to exit. This effectively works like !quit and allows
 #     the ongoing games to finish.
@@ -76,9 +77,8 @@ perl ../spads.pl spads_cluster.conf \
 
 manager_pid=$!
 
-spads_instance_pattern='spads.pl.*InstanceName='
+spads_instance_pattern='spads.pl.*InstanceName[=]'
 engine_pattern='spring-dedicated'
-inactive_stop_timeout=60
 
 reload=false
 
@@ -89,10 +89,7 @@ trap 'script_interrupted=true; reload=false; kill $manager_pid;' SIGINT SIGTERM
 # in the same cgroup as the current process. Each systemd service has
 # it's own cgroup.
 function child_ {
-	# TODO: Actually use --cgroup flag once we are on the fresher system like
-	#       current stable Debian 12 that has it.
-	# "$1" --cgroup $(cat /proc/$$/cgroup | cut -b 4-) -f "${@:2}"
-	"$1" -f "${@:2}"
+	"$1" --cgroup $(cat /proc/$$/cgroup | cut -b 4-) -f "${@:2}"
 }
 
 systemd-notify --ready --status="SPADS started"
@@ -125,37 +122,22 @@ while [[ $script_interrupted = true ]]; do
 	fi
 done
 
-kill $status_loop_pid
-wait $status_loop_pid
-
 if [[ $reload = true ]] && (( $manager_exit_code == 0 )); then
-	systemd-notify --status="Waiting $inactive_stop_timeout seconds for inactive instances to stop..."
-	sleep $(( $inactive_stop_timeout + 5 ))
-
-	# Double check that we want to reload, not stop, after sleep
-	if [[ $reload = true ]]; then
-		# TODO: for Type=notify-reload, --reloading arg available only since systemd v253
-		systemd-notify --status="Restarting SPADS manager..."
-		exec "$0"
-	fi
+	systemd-notify --reloading
+	child_ pkill "$spads_instance_pattern"
+	kill $status_loop_pid
+	wait $status_loop_pid
+	systemd-notify --status="Restarting SPADS manager..."
+	exec "$0"
+else
+	systemd-notify --stopping
+	child_ pkill "$spads_instance_pattern"
+	while child_ pidwait "$spads_instance_pattern"; do :; done
+	kill $status_loop_pid
+	wait $status_loop_pid
+	systemd-notify --status="Done"
+	exit $manager_exit_code
 fi
-
-# TODO: for Type=notify-reload, --stopping arg available only since systemd v253
-systemd-notify --status="Waiting for room SPADS instances to exit..."
-child_ pkill $spads_instance_pattern
-
-# TODO: pidwait is broken on Debian 11... https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1006395
-#       so we do manual loop over proc...
-# child_ pidwait $spads_instance_pattern
-
-for pid in $(child_ pgrep $spads_instance_pattern); do
-	while [[ -f /proc/$pid/comm ]]; do
-		sleep 1
-	done
-done
-
-systemd-notify --status="Exiting"
-exit $manager_exit_code
 
 
 }

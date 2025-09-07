@@ -77,10 +77,6 @@
   ansible.builtin.template:
     src: "spads_cluster_launcher.sh.j2"
     dest: "{{ spads_install_path }}/etc/spads_cluster_launcher.sh"
-
-- name: Change permissions of SPADS cluster launcher script
-  ansible.builtin.file:
-    path: "{{ spads_install_path }}/etc/spads_cluster_launcher.sh"
     mode: 0755
 
 - name: Change permissions of setcpuaffinity.sh script

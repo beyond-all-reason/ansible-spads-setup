@@ -21,9 +21,3 @@
         state: reloaded
       with_items:
         - spads.service
-        
-    - name: Quit all SPADs game instances
-      become: yes
-      ansible.builtin.command:
-        cmd: "pkill -f 'spads.pl.*InstanceName='"
-
