@@ -122,6 +122,9 @@ ansible-playbook -l test1 register_bot.yaml
 
 After that, you have to give the newly created account "Bot", "Verified" **and "Moderator"** roles manually in the teiserver web interface.
 
+> [!CAUTION]
+> If you are creating a new account for the bot because you are repointing SPADS at different instance or because you cleaned up the teiserver database, you **must** drop the `spads/var/ClusterManager/existingAccounts.dat` file because without it SPADS will think the account already exists and won't try to create it again.
+
 ## Cleanup
 
 To stop and remove the container:
