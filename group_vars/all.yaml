@@ -85,4 +85,4 @@ autoinstaller_owner: changeme
 
 mapSyncer_mqttBroker: broker.hivemq.com
 
-zabbix_repo_url: "https://repo.zabbix.com/zabbix/7.2/release/debian/pool/main/z/zabbix-release/zabbix-release_latest_7.2+debian12_all.deb"
+zabbix_repo_url: "https://repo.zabbix.com/zabbix/7.4/release/debian/pool/main/z/zabbix-release/zabbix-release_latest_7.4+debian13_all.deb"

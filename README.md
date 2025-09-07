@@ -70,7 +70,7 @@ To create a new container and initialize it via cloud-init, run the following co
 ```
 touch .incus-integration-on && \
 chmod 0600 test.ssh.key && \
-incus launch images:debian/bookworm/cloud spads-test1 < test.incus.yml && \
+incus launch images:debian/trixie/cloud spads-test1 < test.incus.yml && \
 incus exec spads-test1 -- cloud-init status --wait
 ```
 
