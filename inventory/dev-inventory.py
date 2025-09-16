@@ -45,7 +45,8 @@ def main():
         hostvars[host] = {
             "ansible_host": ip,
             "ansible_user": "ansible",
-            "ansible_ssh_private_key_file": "test.ssh.key"
+            "ansible_ssh_private_key_file": "test.ssh.key",
+            "ansible_ssh_common_args": "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
         }
     print(json.dumps({
         "_meta": {
