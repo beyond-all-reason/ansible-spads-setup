@@ -6,6 +6,16 @@ This repository contains Ansible playbooks for setting up SPADS servers.
 Install python3.
 > sudo apt install python3
 
+### Dependencies
+
+Make sure required collections are installed by running:
+
+```
+ansible-galaxy collection install -r requirements.yml
+```
+
+If you pull repo and there are changes to that fille, you need to rerun the command to make sure you pick up latest changes.
+
 ## On the Ansible server
 1. Install Ansible and sshpass.
    > sudo apt install ansible sshpass
@@ -124,6 +134,16 @@ After that, you have to give the newly created account "Bot", "Verified" **and "
 
 > [!CAUTION]
 > If you are creating a new account for the bot because you are repointing SPADS at different instance or because you cleaned up the teiserver database, you **must** drop the `spads/var/ClusterManager/existingAccounts.dat` file because without it SPADS will think the account already exists and won't try to create it again.
+
+### Monitoring host
+
+To configure sending metrics to local monitoring host set up with [ansible-monitoring](https://github.com/beyond-all-reason/ansible-monitoring) playbook, run:
+
+```
+MON_HOST_IP=$(incus list -f csv -c 4 bar-mon-test | grep -E 'eth|enp' | cut -d' ' -f1)
+ansible-playbook -l test play.yaml --diff -t monitoring \
+  -e "{ configure_monitoring: true, monitoring_metrics_write_host_ip: $MON_HOST_IP }"
+```
 
 ## Cleanup
 

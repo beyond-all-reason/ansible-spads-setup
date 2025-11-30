@@ -22,3 +22,7 @@ mapSyncer_healthcheckUrl: https://hc-ping.com/{{ vault_healthchecksioPingKey }}/
 configure_zabbix_agent: true
 zabbix_psk: "{{ vault_zabbix_psk }}"
 zabbix_server: 192.3.148.174
+
+configure_monitoring: true
+monitoring_write_instance_dev: false
+monitoring_metrics_write_password: "{{ vault_monitoring_metrics_write_password }}"

@@ -37,3 +37,9 @@
   ansible.builtin.import_tasks:
     file: services.yaml
   tags: services
+
+- name: Attach client montoring
+  ansible.builtin.import_role:
+    name: beyondallreason.monitoring.client
+  tags: monitoring
+  when: configure_monitoring
