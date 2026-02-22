@@ -1,0 +1,6 @@
+[project]
+name = "ansible-spads-setup"
+version = "0.1.0"
+description = "Ansible playbooks to setup BAR SPADS Server"
+requires-python = ">=3.13"
+dependencies = ["ansible==12.3.0"]
