@@ -1,0 +1,4 @@
+# Override engine version for hosts in the [engine_testing] inventory group.
+# Update these values to point to the testing engine release.
+engine_github_path: https://github.com/beyond-all-reason/RecoilEngine/releases/download/2025.06.11/recoil_2025.06.11_amd64-linux.7z
+engine_dir: recoil_2025.06.11_amd64-linux
