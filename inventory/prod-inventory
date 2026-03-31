@@ -20,6 +20,9 @@ us5 ansible_host=45.45.216.125 ansible_user=debian
 #East Asia
 ea1 ansible_host=103.73.67.214 ansible_user=debian
 
+#Engine Testing host(s)
+ng1 ansible_host=31.187.74.83 ansible_user=debian
+
 # add each server to the matching region below
 [au]
 au1
@@ -28,6 +31,7 @@ au2
 [eu]
 eu[1:4]
 eu[6:8]
+ng1
 
 [us]
 us[1:5]
@@ -40,3 +44,8 @@ au
 eu
 us
 ea
+
+# Hosts in this group will run the testing engine version
+# defined in group_vars/engine_testing.yaml
+[engine_testing]
+ng1

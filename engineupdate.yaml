@@ -1,4 +1,8 @@
 ---
+# Usage:
+#   All hosts:            ansible-playbook engineupdate.yaml
+#   Testing hosts only:   ansible-playbook engineupdate.yaml --limit engine_testing
+#   Production only:      ansible-playbook engineupdate.yaml --limit 'all:!engine_testing'
 - name: Update SPADS engine
   hosts: all
 #  remote_user: root
