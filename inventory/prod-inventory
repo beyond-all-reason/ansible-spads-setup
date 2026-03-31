@@ -31,7 +31,6 @@ au2
 [eu]
 eu[1:4]
 eu[6:8]
-ng1
 
 [us]
 us[1:5]
@@ -44,6 +43,7 @@ au
 eu
 us
 ea
+engine_testing
 
 # Hosts in this group will run the testing engine version
 # defined in group_vars/engine_testing.yaml
