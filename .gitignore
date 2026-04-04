@@ -1,2 +1,3 @@
 /.incus-integration-on
 .ansible/
+.python-version
