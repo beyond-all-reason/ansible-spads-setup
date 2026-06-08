@@ -26,3 +26,4 @@ zabbix_server: 192.3.148.174
 configure_monitoring: true
 monitoring_write_instance_dev: false
 monitoring_metrics_write_password: "{{ vault_monitoring_metrics_write_password }}"
+monitoring_logs_write_password: "{{ vault_monitoring_logs_write_password }}"

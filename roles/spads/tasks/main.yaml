@@ -43,3 +43,8 @@
     name: beyondallreason.monitoring.client
   tags: monitoring
   when: configure_monitoring
+  vars:
+    monitoring_log_configs:
+      fluent_bit:
+        - template: fluent-bit.yaml.j2
+          dest_name: spads.yaml

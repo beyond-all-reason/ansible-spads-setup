@@ -1,0 +1,42 @@
+pipeline:
+  inputs:
+    - name: tail
+      # there are also unitsync.log under each cluster instance
+      # these are ignored (for now?), as their format is rather weird
+      # and I don't know how useful they are at all.
+      path: "{{ spads_install_path }}/var/ClusterManager/*/log/spads.log"
+      db: /var/lib/fluent-bit/cluster-spads.db
+      read_from_head: false
+      tag: "spads.<spads_host>"
+      tag_regex: '.*/ClusterManager/(?<spads_host>[^/]*)'
+      multiline.parser: spads-with-exc
+
+  filters:
+    - name: parser
+      match: 'spads.*'
+      key_name: log
+      parser: spads_parser
+
+parsers:
+  - name: spads_parser
+    format: regex
+    regex: '/^(?<time>\d{14}) - (?<level>\w*)\s* - \[(?<module>\w+)\] (?<message>.*)/m'
+    time_key: time
+    time_format: '%Y%m%d%H%M%S'
+
+multiline_parsers:
+  # reads spads logs and concatenate exceptions into one log message
+  # because this is wrapped by spads, we can't directly use the python
+  # multiline parser shipped by fluentbit
+  - name: spads-with-exc
+    type: regex
+    rules:
+      - state: start_state
+        regex: '/^\d{14}.*/'
+        next_state: traceback
+
+      # at the end of the exception, there is an empty line, which will not
+      # match the regex and stop the multiline parser
+      - state: traceback
+        regex: '/^Traceback.*|^  .*|^[^\d].*/'
+        next_state: traceback

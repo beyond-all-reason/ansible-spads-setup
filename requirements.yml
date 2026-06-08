@@ -1,4 +1,4 @@
 collections:
   - name: https://github.com/beyond-all-reason/ansible-monitoring.git
     type: git
-    version: 17e55d358b4b5e7f81bec9ff2fd73289f7e39750
+    version: f9c1ac27c6fa406de00796df12d587014a249b3b
