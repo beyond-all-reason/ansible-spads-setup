@@ -142,7 +142,7 @@ To configure sending metrics to local monitoring host set up with [ansible-monit
 ```
 MON_HOST_IP=$(incus list -f csv -c 4 bar-mon-test | grep -E 'eth|enp' | cut -d' ' -f1)
 ansible-playbook -l test play.yaml --diff -t monitoring \
-  -e "{ configure_monitoring: true, monitoring_write_host_ip: $MON_HOST_IP, domain_name_victorialogs: 'logs.bar-mon.local' }"
+  -e "{ configure_monitoring: true, monitoring_write_host_ip: $MON_HOST_IP }"
 ```
 
 ## Cleanup
