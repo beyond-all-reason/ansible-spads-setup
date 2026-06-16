@@ -1,0 +1,32 @@
+# Headless one-shot startscript to regenerate game_modes.json from the installed
+# game archive. Boots spring-headless, enables the BAR "Game Modes JSON Export"
+# LuaUI widget (ships inside the game archive), runs /exportgamemodes, quits.
+# @GAMETYPE@ and @MAPNAME@ are substituted by regen_game_modes.sh at runtime.
+[GAME]
+{
+	MapName=@MAPNAME@;
+	GameType=@GAMETYPE@;
+	GameStartDelay=0;
+	StartPosType=0;
+	RecordDemo=0;
+	MyPlayerName=ModesExporter;
+	IsHost=1;
+	FixedRNGSeed=1;
+	[MODOPTIONS]
+	{
+		debugcommands=1:luaui enablewidget Game Modes JSON Export|2:exportgamemodes|3:quitforce;
+		deathmode=neverend;
+	}
+	[ALLYTEAM0]
+	{
+	}
+	[TEAM0]
+	{
+		allyteam=0;
+		teamleader=0;
+	}
+	[PLAYER0]
+	{
+		team=0;
+	}
+}

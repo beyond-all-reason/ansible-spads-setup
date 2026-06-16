@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Regenerate game_modes.json for the SPADS ModeCommand plugin from the installed
+# BAR game archive. Hooked as ExecStartPost of pr-downloader.service so it runs
+# after each game sync, but skips the expensive headless boot unless the
+# byar:test game version actually changed.
+set -euo pipefail
+
+SPADS="{{ spads_install_path }}"
+ENGINE_DIR="{{ engine_dir }}"
+DATA="{{ spads_springDataDir }}"
+RAPID_TAG="byar:test"                          # [VERIFY] matches pr-downloader.service target
+MAP_NAME="{{ regen_game_modes_map }}"          # [VERIFY] this map must be synced on the host
+
+HEADLESS="${SPADS}/var/spring/${ENGINE_DIR}/spring-headless"   # [VERIFY] present in release
+REGEN_DIR="${SPADS}/var/regen"
+STARTSCRIPT_TMPL="${REGEN_DIR}/startscript_modes_export.txt"
+STARTSCRIPT="${REGEN_DIR}/startscript_modes_export.run.txt"
+OUT="${REGEN_DIR}/game_modes.json"             # write-dir output (widget writes game_modes.json)
+PLUGIN_JSON="${SPADS}/var/plugins/ModeCommand/game_modes.json"  # [VERIFY] where modecommand.py reads
+STATE_FILE="${REGEN_DIR}/.last_game_version"
+
+mkdir -p "${REGEN_DIR}"
+
+# Resolve the currently-installed byar:test version from rapid metadata.
+# versions.gz lines are: <tag>,<sdp_md5>,<depends>,<name>
+versions_file="$(find "${DATA}/rapid" -name versions.gz 2>/dev/null | head -n1 || true)"
+sdp=""; game_name=""
+if [[ -n "${versions_file}" ]]; then
+	line="$(zcat "${versions_file}" 2>/dev/null | awk -F, -v t="${RAPID_TAG}" '$1==t{print; exit}' || true)"
+	sdp="$(awk -F, '{print $2}' <<<"${line}")"
+	game_name="$(awk -F, '{print $4}' <<<"${line}")"
+fi
+
+# Cheap guard: nothing to do if the resolved version is unchanged.
+if [[ -n "${sdp}" && -f "${STATE_FILE}" && "$(cat "${STATE_FILE}")" == "${sdp}" && -f "${PLUGIN_JSON}" ]]; then
+	exit 0
+fi
+
+# Fall back to the rapid tag if we couldn't resolve the archive name.
+[[ -z "${game_name}" ]] && game_name="${RAPID_TAG}"   # [VERIFY] engine resolves rapid tag as GameType
+
+sed -e "s|@GAMETYPE@|${game_name}|" -e "s|@MAPNAME@|${MAP_NAME}|" \
+	"${STARTSCRIPT_TMPL}" > "${STARTSCRIPT}"
+
+rm -f "${OUT}"
+"${HEADLESS}" --isolation --write-dir "${REGEN_DIR}" "${STARTSCRIPT}"
+
+if [[ ! -f "${OUT}" ]]; then
+	echo "regen_game_modes: export produced no ${OUT}" >&2
+	exit 1
+fi
+
+# Replace the plugin's copy when the presets changed. No SPADS reload here: the
+# plugin re-reads game_modes.json on mtime change, and this runs as the
+# unprivileged spads user (cannot reload the service anyway).
+if [[ ! -f "${PLUGIN_JSON}" ]] || ! cmp -s "${OUT}" "${PLUGIN_JSON}"; then
+	install -D -m 0644 "${OUT}" "${PLUGIN_JSON}"
+fi
+
+[[ -n "${sdp}" ]] && echo "${sdp}" > "${STATE_FILE}"

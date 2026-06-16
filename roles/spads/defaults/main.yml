@@ -1,2 +1,7 @@
 ---
 # defaults file for spads
+
+# Map used by the headless game_modes.json regeneration boot (regen_game_modes.sh).
+# Must be a map that is synced on the host; the export reads no map data, it only
+# needs a valid map for the engine to start a game. Override per-host if needed.
+regen_game_modes_map: "Quicksilver Remake 1.24"

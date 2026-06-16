@@ -9,6 +9,19 @@
     - clear_rapid_packages.sh
     - clear_replays.sh
 
+- name: Install game_modes regen script and startscript
+  become: yes
+  become_user: "{{ spads_username }}"
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: spads
+    group: spads
+  with_items:
+    - { src: "regen_game_modes.sh.j2", dest: "{{ spads_install_path }}/regen_game_modes.sh", mode: "0755" }
+    - { src: "startscript_modes_export.txt.j2", dest: "{{ spads_install_path }}/var/regen/startscript_modes_export.txt", mode: "0644" }
+
 - name: Install systemd service
   ansible.builtin.template:
     src: "{{ item }}.j2"
