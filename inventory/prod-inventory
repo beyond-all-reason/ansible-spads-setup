@@ -23,6 +23,9 @@ ea1 ansible_host=103.73.67.214 ansible_user=debian
 #Engine Testing host(s)
 ng1 ansible_host=31.187.74.83 ansible_user=debian
 
+# Isolated host for testing lobby server without user data
+lobby-server-dev ansible_host=lobby-server-dev.beyondallreason.dev ansible_user=ansible
+
 # add each server to the matching region below
 [au]
 au1
@@ -31,6 +34,7 @@ au2
 [eu]
 eu[1:4]
 eu[6:8]
+lobby-server-dev
 
 [us]
 us[1:5]

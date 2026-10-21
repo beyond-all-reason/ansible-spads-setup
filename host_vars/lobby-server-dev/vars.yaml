@@ -1,0 +1,18 @@
+spads_lobbyHost: lobby-server-dev.beyondallreason.dev
+
+# Force it to look like EU1 on lobby server for chobby
+spads_registrationEmail: "eu1@spads.local"
+spads_hostRegion: '"EU1 - "'
+spads_lobbyLogin: 'Host[EU1]'
+spads_channel: HostEU1
+spads_maxInstances: 20
+
+# Disable all the prod integrations with the rest of infra
+sftp_login: "invalid"
+sftp_password: "invalid"
+configure_swap: false
+mapSyncer_healthcheckUrl: null
+zabbix_psk: "fake_psk"
+configure_zabbix_agent: false
+zabbix_server: 127.0.0.1
+configure_monitoring: false
