@@ -17,6 +17,11 @@ pipeline:
       key_name: log
       parser: spads_parser
 
+    - name: record_modifier
+      match: 'spads.*'
+      record:
+        - stream spads
+
 parsers:
   - name: spads_parser
     format: regex
