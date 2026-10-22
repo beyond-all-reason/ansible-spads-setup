@@ -90,14 +90,6 @@
     dest: "{{ spads_install_path }}"
     remote_src: yes
 
-- name: Run pr-downloader
-  ansible.builtin.command:
-    cmd: "env PRD_RAPID_USE_STREAMER=false PRD_RAPID_REPO_MASTER=https://repos.beyondallreason.dev/repos.gz {{ spads_install_path }}/pr-downloader --filesystem-writepath {{ spads_install_path }}/var/spring/data byar:test"
-    creates: "{{ spads_install_path }}/var/spring/data"
-  register: out
-
-- debug: var=out.stdout_lines
-
 - name: Setup secrets.env file
   ansible.builtin.template:
     src: "secrets.env.j2"
