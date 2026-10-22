@@ -7,10 +7,10 @@ spads_install_path: "{{ user_homedir }}/spads"
 # skips the tasks in the delete.yaml playbook if false as a safety mechanism
 allow_delete: false
 
-# Important: The URL's for engine releases contain %7B characters for brackets. It seems that wget does not always like these, so replace with {}
-# Note that these characters get replaced with '.' characters for the engine_dir
-engine_github_path: https://github.com/beyond-all-reason/RecoilEngine/releases/download/2026.07.04/recoil_2026.07.04_amd64-linux.7z
-engine_dir: recoil_2026.07.04_amd64-linux
+# Engine used by SPADS and recoil autohost
+engine_version: "2026.07.04"
+engine_github_path: "https://github.com/beyond-all-reason/RecoilEngine/releases/download/{{ engine_version }}/recoil_{{ engine_version }}_amd64-linux.7z"
+engine_dir: "recoil_{{ engine_version }}_amd64-linux"
 
 # allows to enable additonal services on the per-host basis
 ufw_additional_profiles: []
