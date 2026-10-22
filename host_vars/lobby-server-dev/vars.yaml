@@ -1,3 +1,4 @@
+force_hostname: lobby-server-dev
 spads_lobbyHost: lobby-server-dev.beyondallreason.dev
 
 # Force it to look like EU1 on lobby server for chobby
