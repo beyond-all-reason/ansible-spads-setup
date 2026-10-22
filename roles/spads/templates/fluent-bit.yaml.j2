@@ -17,6 +17,11 @@ pipeline:
       key_name: log
       parser: spads_parser
 
+    # SPADS spams these in bulk, and they are not actionable
+    - name: grep
+      match: 'spads.*'
+      exclude: message ^Missing LEFT command before REMOVEUSER
+
     - name: record_modifier
       match: 'spads.*'
       record:
