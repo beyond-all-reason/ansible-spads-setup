@@ -7,6 +7,7 @@ pipeline:
       path: "{{ spads_install_path }}/var/ClusterManager/*/log/spads.log"
       db: /var/lib/fluent-bit/cluster-spads.db
       read_from_head: false
+      skip_long_lines: true
       tag: "spads.<spads_host>"
       tag_regex: '.*/ClusterManager/(?<spads_host>[^/]*)'
       multiline.parser: spads-with-exc
