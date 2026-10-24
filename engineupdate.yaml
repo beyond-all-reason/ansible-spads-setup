@@ -17,7 +17,14 @@
       register: out
 
     - debug: var=out.stdout_lines
-    
+
+    - name: Install recoil autohost engine
+      ansible.builtin.import_role:
+        name: recoil_autohost
+        tasks_from: engine.yaml
+      become: true
+      when: recoil_autohost_enabled | bool
+
     - name: Reload SPADS
       become: yes
       ansible.builtin.systemd:

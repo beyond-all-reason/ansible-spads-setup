@@ -14,3 +14,9 @@ zabbix_psk: "fake_psk"
 configure_zabbix_agent: false
 zabbix_server: 127.0.0.1
 configure_monitoring: false
+# Teiserver's OAuth2 token endpoint uses its domain name, so autohost must too.
+recoil_autohost_tachyon_server: teiserver.local
+recoil_autohost_tls_verify: false
+recoil_autohost_enabled: true
+recoil_autohost_client_id: "autohost-{{ inventory_hostname }}"
+recoil_autohost_client_secret: "autohost-{{ inventory_hostname }}-secret"

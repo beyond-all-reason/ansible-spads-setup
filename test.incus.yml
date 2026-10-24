@@ -1,4 +1,7 @@
 config:
+  security.nesting: true
+  # privileged needed to use filesystem idmap
+  security.privileged: true
   cloud-init.user-data: |
     #cloud-config
     package_upgrade: true

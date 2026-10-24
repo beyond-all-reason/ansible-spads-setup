@@ -1,0 +1,77 @@
+# Base podman setup, kept identical to ansible-teiserver, rapid-hosting and
+# other playbooks so these playbooks can be run against the same host.
+- name: Install podman
+  ansible.builtin.package:
+    name: podman
+    state: present
+
+- name: Make sure podman resolves docker.io correctly without prefix
+  ansible.builtin.copy:
+    dest: /etc/containers/registries.conf.d/unqualified-search.conf
+    content: |
+      unqualified-search-registries = ['docker.io']
+    mode: '0644'
+
+- name: Make sure podman network works well with ufw
+  ansible.builtin.copy:
+    dest: /etc/containers/containers.conf
+    content: |
+      [network]
+      # We set iptables driver so it plays well with ufw that also uses iptables
+      firewall_driver = "iptables"
+    mode: '0644'
+
+- name: Configure uid/gid mapping ranges
+  ansible.builtin.lineinfile:
+    path: "{{ item }}"
+    regexp: "^containers:"
+    line: containers:10000000:10000000
+  loop:
+    - /etc/subgid
+    - /etc/subuid
+
+- name: Enable podman auto update
+  ansible.builtin.systemd_service:
+    name: podman-auto-update.timer
+    enabled: true
+    state: started
+
+- name: Create Quadlet file for podman network
+  containers.podman.podman_network:
+    name: priv
+    state: quadlet
+    subnet: "10.89.0.0/24"
+    gateway: "10.89.0.1"
+    quadlet_options:
+      - Options=com.docker.network.bridge.name=podmanpriv
+
+- name: Start podman network
+  ansible.builtin.systemd_service:
+    name: priv-network.service
+    state: started
+    daemon_reload: true
+
+- name: Create /etc/systemd/network
+  ansible.builtin.file:
+    path: /etc/systemd/network
+    state: directory
+    mode: "0755"
+
+- name: Configure DNS resolution of podman containers from host
+  ansible.builtin.copy:
+    dest: /etc/systemd/network/90-podmanpriv.network
+    content: |
+      [Match]
+      Name=podmanpriv
+
+      [Network]
+      DNS=10.89.0.1
+      Domains=~dns.podman
+      KeepConfiguration=yes
+    mode: "0644"
+  notify: Reload systemd-networkd
+
+# Applied right away, so a run failing later doesn't leave the drop-in
+# unapplied which will cause the next run to not trigger handlers.
+- name: Apply podman network DNS configuration
+  ansible.builtin.meta: flush_handlers

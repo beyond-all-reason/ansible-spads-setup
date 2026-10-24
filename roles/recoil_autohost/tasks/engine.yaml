@@ -1,0 +1,41 @@
+# Installs engine_version for recoil autohost, also used by engineupdate.yaml.
+# TODO: Remove once recoil autohost can install engines itself, tracked in
+#   https://github.com/beyond-all-reason/recoil-autohost/issues/6
+- name: Check if recoil autohost has engine {{ engine_version }}
+  ansible.builtin.stat:
+    path: "/opt/recoil-autohost/engines/{{ engine_version }}"
+  register: recoil_autohost_engine_stat
+
+# Extracted next to engines/ and moved in at the end, as autohost picks up every
+# new directory in engines/ as an available engine version.
+- name: Install recoil autohost engine {{ engine_version }}
+  when: not recoil_autohost_engine_stat.stat.exists
+  block:
+    - name: Create engine download directory
+      ansible.builtin.file:
+        path: /opt/recoil-autohost/engines-tmp
+        state: directory
+        mode: "0755"
+    - name: Download engine {{ engine_version }}
+      ansible.builtin.get_url:
+        url: "{{ engine_github_path }}"
+        dest: "/opt/recoil-autohost/engines-tmp/{{ engine_version }}.7z"
+        mode: "0644"
+    # Leftovers from an interrupted extraction must not end up in engines/.
+    - name: Remove partially extracted engine {{ engine_version }}
+      ansible.builtin.file:
+        path: "/opt/recoil-autohost/engines-tmp/{{ engine_version }}"
+        state: absent
+    - name: Extract engine {{ engine_version }}
+      ansible.builtin.command:
+        cmd: "7z x -y -o{{ engine_version }} {{ engine_version }}.7z"
+        chdir: /opt/recoil-autohost/engines-tmp
+      changed_when: true
+    - name: Move into engines directory engine {{ engine_version }}
+      ansible.builtin.command:
+        cmd: "mv /opt/recoil-autohost/engines-tmp/{{ engine_version }} /opt/recoil-autohost/engines/{{ engine_version }}"
+        creates: "/opt/recoil-autohost/engines/{{ engine_version }}"
+    - name: Remove engine download directory
+      ansible.builtin.file:
+        path: /opt/recoil-autohost/engines-tmp
+        state: absent

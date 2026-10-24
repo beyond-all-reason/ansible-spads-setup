@@ -1,0 +1,47 @@
+pipeline:
+  inputs:
+    # _SYSTEMD_UNIT gets the container output and podman's events, UNIT gets
+    # systemd's messages about the unit.
+    - name: systemd
+      tag: recoil-autohost
+      systemd_filter:
+        - _SYSTEMD_UNIT=recoil-autohost.service
+        - UNIT=recoil-autohost.service
+      systemd_filter_type: or
+      db: /var/lib/fluent-bit/recoil-autohost.db
+      read_from_tail: true
+      strip_underscores: true
+
+  filters:
+    # The service writes one JSON object per line, we keep only its fields.
+    - name: parser
+      match: recoil-autohost
+      key_name: MESSAGE
+      parser: recoil_autohost_json
+
+    # A line that is not JSON, from podman, systemd or a crash before the logger
+    # ran, still has MESSAGE. Keep only that, the rest of the journal record is
+    # a few kB of image labels and command lines.
+    - name: lua
+      match: recoil-autohost
+      call: to_stream
+      code: |
+        function to_stream(tag, timestamp, record)
+           if record["MESSAGE"] ~= nil then
+              record = { message = record["MESSAGE"] }
+           end
+           record["stream"] = tag
+           return 1, timestamp, record
+        end
+
+    # The output posts _msg_field=message, pino uses `msg`.
+    - name: modify
+      match: recoil-autohost
+      rename:
+        - msg message
+
+parsers:
+  - name: recoil_autohost_json
+    format: json
+    time_key: time
+    time_format: '%Y-%m-%dT%H:%M:%S.%LZ'

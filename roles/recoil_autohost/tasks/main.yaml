@@ -1,0 +1,110 @@
+- name: Check recoil autohost credentials are set
+  ansible.builtin.assert:
+    that:
+      - recoil_autohost_client_id != ''
+      - recoil_autohost_client_secret != ''
+    fail_msg: recoil_autohost_client_id and recoil_autohost_client_secret must be set
+    quiet: true
+
+- name: Set up podman
+  ansible.builtin.import_tasks:
+    file: podman.yaml
+
+- name: Configure firewall for recoil autohost
+  ansible.builtin.import_tasks:
+    file: firewall.yaml
+  tags:
+    - container_incompatible
+    - firewall
+
+- name: Reserve recoil autohost engine ports
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_local_reserved_ports
+    value: "{{ recoil_autohost_engine_ports }}"
+    sysctl_file: /etc/sysctl.d/90-recoil-autohost.conf
+
+- name: Create recoil autohost directories
+  ansible.builtin.file:
+    path: "/opt/recoil-autohost/{{ item.name }}"
+    state: directory
+    mode: "{{ item.mode }}"
+  loop:
+    - {name: config, mode: "0755"}
+    - {name: engines, mode: "0755"}
+    - {name: instances, mode: "0700"}
+
+- name: Install recoil autohost engine
+  ansible.builtin.import_tasks:
+    file: engine.yaml
+
+- name: Write recoil autohost config
+  ansible.builtin.copy:
+    dest: /opt/recoil-autohost/config/config.json
+    content: "{{ autohost_config | to_nice_json }}"
+    mode: "0600"
+  vars:
+    autohost_config:
+      tachyonServer: "{{ recoil_autohost_tachyon_server }}"
+      authClientId: "{{ recoil_autohost_client_id }}"
+      authClientSecret: "{{ recoil_autohost_client_secret }}"
+      hostingIP: "{{ ansible_default_ipv4.address }}"
+      engineStartPort: "{{ recoil_autohost_engine_start_port | int }}"
+      engineAutohostStartPort: "{{ recoil_autohost_engine_autohost_start_port | int }}"
+      maxPortsUsed: "{{ recoil_autohost_max_ports | int }}"
+      metricsPort: "{{ recoil_autohost_metrics_port | int }}"
+  no_log: true
+  notify: Restart recoil autohost
+
+- name: Set up recoil autohost container
+  containers.podman.podman_container:
+    name: recoil-autohost
+    state: quadlet
+    image: ghcr.io/beyond-all-reason/recoil-autohost:latest
+    network: priv.network
+    log_driver: journald
+    ports:
+      - "{{ recoil_autohost_engine_ports }}:{{ recoil_autohost_engine_ports }}/udp"
+    # Podman splits sysctl values on commas, so we reserve a single range
+    # spanning both of them.
+    sysctl:
+      net.ipv4.ip_local_reserved_ports: >-
+        {{ [recoil_autohost_engine_start_port, recoil_autohost_engine_autohost_start_port] | min }}-{{
+        ([recoil_autohost_engine_start_port, recoil_autohost_engine_autohost_start_port] | max) + recoil_autohost_max_ports - 1 }}
+    volumes:
+      # The service runs as uid 1000 in the container, map it to root on the
+      # host so it can read the config and own the instances it writes.
+      - "/opt/recoil-autohost/config:/app/config:ro,idmap=uids=@0-1000-1;gids=@0-1000-1"
+      - "/opt/recoil-autohost/engines:/app/engines:ro,idmap"
+      - "/opt/recoil-autohost/instances:/app/instances:idmap=uids=@0-1000-1;gids=@0-1000-1"
+    env: "{{ {} if recoil_autohost_tls_verify else {'NODE_TLS_REJECT_UNAUTHORIZED': '0'} }}"
+    # Auto update restarts the service, which kills all running battles, improvement
+    # tracked in https://github.com/beyond-all-reason/recoil-autohost/issues/1.
+    quadlet_options:
+      - "AutoUpdate=registry"
+      - "Pull=newer"
+      - "UserNS=auto"
+      - |
+        [Install]
+        WantedBy=default.target
+      - |
+        [Service]
+        Restart=on-failure
+        RestartSec=10
+  notify: Restart recoil autohost
+
+- name: Start and enable recoil autohost service
+  ansible.builtin.systemd_service:
+    name: recoil-autohost.service
+    enabled: true
+    state: started
+    daemon_reload: true
+
+# Autohost never removes the instance directories of finished battles,
+# systemd-tmpfiles-clean.timer removes what wasn't touched for 7 days.
+# TODO: Drop after https://github.com/beyond-all-reason/recoil-autohost/issues/15
+- name: Configure cleanup of old recoil autohost instances
+  ansible.builtin.copy:
+    dest: /etc/tmpfiles.d/recoil-autohost.conf
+    content: |
+      d /opt/recoil-autohost/instances 0700 root root 7d
+    mode: "0644"

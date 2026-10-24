@@ -1,2 +1,5 @@
 spads_maxInstances: 150
 spads_lobbyHost: server5.beyondallreason.info
+recoil_autohost_enabled: true
+recoil_autohost_client_id: "1f824c89-6e90-43de-a9c5-ebee03df19e8"
+recoil_autohost_client_secret: "{{ vault_recoil_autohost_client_secret }}"

@@ -4,3 +4,33 @@
   roles:
     - role: spads
       become: true
+
+    - role: recoil_autohost
+      become: true
+      tags: recoil_autohost
+      when: recoil_autohost_enabled | bool
+
+    # Run once, after all roles above, with the scrape and log configs of all of them.
+    - role: beyondallreason.monitoring.client
+      become: true
+      tags: monitoring
+      when: configure_monitoring
+      vars:
+        monitoring_scrape_configs: "{{ recoil_autohost_enabled | bool | ternary(recoil_autohost_scrape_configs, {}) }}"
+        recoil_autohost_scrape_configs:
+          01_recoil_autohost:
+            - job_name: recoil-autohost
+              static_configs:
+                - targets:
+                    - "recoil-autohost.dns.podman:{{ recoil_autohost_metrics_port }}"
+              relabel_configs:
+                - target_label: instance
+                  replacement: "{{ ansible_hostname }}"
+        monitoring_log_configs:
+          fluent_bit: "{{ [spads_log_config] + (recoil_autohost_enabled | bool | ternary([recoil_autohost_log_config], [])) }}"
+        spads_log_config:
+          template: roles/spads/templates/fluent-bit.yaml.j2
+          dest_name: spads.yaml
+        recoil_autohost_log_config:
+          template: roles/recoil_autohost/templates/fluent-bit.yaml.j2
+          dest_name: recoil-autohost.yaml

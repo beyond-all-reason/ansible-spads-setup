@@ -1,0 +1,13 @@
+---
+recoil_autohost_tachyon_server: "{{ spads_lobbyHost }}"
+# OAuth2 client credentials of the autohost bot in teiserver, set per host.
+recoil_autohost_client_id: ""
+recoil_autohost_client_secret: ""
+# Used in config.json, port publishing, ufw and ip_local_reserved_ports.
+recoil_autohost_engine_start_port: 20000
+recoil_autohost_engine_autohost_start_port: 22000
+recoil_autohost_max_ports: 1000
+# Prometheus metrics, only reachable via podman network, scraped by vmagent.
+recoil_autohost_metrics_port: 9467
+# Verify TLS certificate of teiserver, dev instances have self-signed one.
+recoil_autohost_tls_verify: true

@@ -1,0 +1,10 @@
+---
+- name: Reload systemd-networkd
+  ansible.builtin.systemd_service:
+    name: systemd-networkd
+    state: reloaded
+
+- name: Restart recoil autohost
+  ansible.builtin.systemd_service:
+    name: recoil-autohost.service
+    state: restarted

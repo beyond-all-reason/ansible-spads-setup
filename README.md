@@ -1,12 +1,8 @@
 # Ansible SPADS setup
 
-This repository contains Ansible playbooks for setting up SPADS servers.
+This repository contains Ansible playbooks for setting up SPADS servers and optionally resoil-autohost.
 
-## On each client (SPADS server)
-Install python3.
-> sudo apt install python3
-
-### Dependencies
+## Dependencies
 
 Make sure required collections are installed by running:
 
@@ -35,7 +31,7 @@ If you pull repo and there are changes to that fille, you need to rerun the comm
    Note: use the hostname set in the inventory file
    > ansible-playbook (playbookfile) -i (inventoryfile) --limit (hostname)
 
-# Examples
+## Examples
 
 **Configure/verify SPADS is configured properly on all servers**
 > ansible-playbook play.yaml --ask-vault-pass
@@ -43,7 +39,7 @@ If you pull repo and there are changes to that fille, you need to rerun the comm
 **Restart all SPADS services only on US2**
 > ansible-playbook restart.yaml --limit us2 --ask-vault-pass
 
-# Available playbooks:
+## Available playbooks:
 - play.yaml - configure SPADS/verify SPADS is configured properly
 - delete.yaml - delete SPADS files and services
 - restart.yaml - restart all SPADS services
@@ -51,7 +47,7 @@ If you pull repo and there are changes to that fille, you need to rerun the comm
 - stop.yaml - stop all SPADS services
 - engineupdate.yaml - runs spads_config_bar_updater.py -c -u (doesn't restart SPADS)
 
-# Ansible Vault
+## Ansible Vault
 Ansible Vault provides a way to encrypt sensitive information used by Ansible. It'll prompt for the password when running a command.
 
 **View encrypted file**
@@ -69,9 +65,21 @@ Ansible Vault provides a way to encrypt sensitive information used by Ansible. I
 **Change the encrpytion key of a file**
 > ansible-vault rekey file1.yaml file2.yaml file3.yaml
 
-# Local testing
+## Recoil autohost
 
-## Setup
+Hosts can additionally run [recoil-autohost](https://github.com/beyond-all-reason/recoil-autohost). It's disabled by default in prod.
+
+To enable it on a host, create bot credentials in teiserver and set in `host_vars/(hostname)/vars.yaml`:
+
+```yaml
+recoil_autohost_enabled: true
+recoil_autohost_client_id: "<client id>"
+recoil_autohost_client_secret: "{{ vault_recoil_autohost_client_secret }}"
+```
+
+## Local testing
+
+### Setup
 
 We use Incus for local testing. Make sure you have it installed and initialized following [the official getting started docs](https://linuxcontainers.org/incus/docs/main/tutorial/first_steps/).
 
@@ -92,9 +100,9 @@ Then test that it works for ansible:
 ansible test1 -m shell -a 'uname -a'
 ```
 
-## Usage
+### Usage
 
-### Run playbook
+#### Run playbook
 
 Now you can use all the playbooks and roles as usual, just make sure you are targeting the `dev` inventory group or individual `test1` host. For example:
 
@@ -108,7 +116,7 @@ To override the lobby server temporarily from default `localhost` without modify
 ansible-playbook -l test1 -e "spads_lobbyHost=10.177.67.244" play.yaml
 ```
 
-### Connect to the container
+#### Connect to the container
 
 To enter into container shell, run the following command:
 
@@ -122,7 +130,7 @@ You can also ssh into it with something like:
 ssh -i test.ssh.key ansible@$(ansible-inventory --host test1 | jq -r '.ansible_host')
 ```
 
-### Register bot with teiserver
+#### Register bot with teiserver
 
 You can register the spads lobby account with teiserver using the `register_bot.yaml` playbook:
 
@@ -135,7 +143,7 @@ After that, you have to give the newly created account "Bot", "Verified" **and "
 > [!CAUTION]
 > If you are creating a new account for the bot because you are repointing SPADS at different instance or because you cleaned up the teiserver database, you **must** drop the `spads/var/ClusterManager/existingAccounts.dat` file because without it SPADS will think the account already exists and won't try to create it again.
 
-### Monitoring host
+#### Monitoring host
 
 To configure sending metrics to local monitoring host set up with [ansible-monitoring](https://github.com/beyond-all-reason/ansible-monitoring) playbook, run:
 
@@ -145,7 +153,15 @@ ansible-playbook -l test play.yaml --diff -t monitoring \
   -e "{ configure_monitoring: true, monitoring_write_host_ip: $MON_HOST_IP }"
 ```
 
-## Cleanup
+#### Recoil autohost
+
+Autohost is enabled in dev. To connect it to the teiserver test container set up with [ansible-teiserver](https://github.com/beyond-all-reason/ansible-teiserver) playbook, run the `register_autohost.yaml` playbook once. It makes `teiserver.local` resolve to `spads_lobbyHost` (teiserver's OAuth2 token endpoint uses its domain name), and creates the bot with credentials from [dev.yaml](group_vars/dev.yaml) in teiserver over ssh:
+
+```
+ansible-playbook -l test1 -e "spads_lobbyHost=10.177.67.244" register_autohost.yaml
+```
+
+### Cleanup
 
 To stop and remove the container:
 

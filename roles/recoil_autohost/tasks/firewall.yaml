@@ -1,0 +1,7 @@
+- name: Allow engine ports for recoil autohost container
+  community.general.ufw:
+    rule: allow
+    route: true
+    interface_out: podmanpriv
+    proto: udp
+    to_port: "{{ recoil_autohost_engine_ports | replace('-', ':') }}"

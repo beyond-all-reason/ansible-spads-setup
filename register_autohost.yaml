@@ -1,0 +1,43 @@
+# Yes, just like register_bot this is SUPER HACKY bad bad bad code that can
+# just break and stop working when teiserver code changes. We will fix it
+# once there is better official way, for now keeping it this way to make the
+# dev setup smoother.
+---
+- name: Register recoil autohost bot with dev teiserver
+  hosts: dev
+  tasks:
+    # Teiserver's OAuth2 token endpoint uses its domain name, so autohost must too.
+    - name: Resolve teiserver domain name to lobby host
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        regexp: '\s{{ recoil_autohost_tachyon_server | regex_escape }}$'
+        line: "{{ spads_lobbyHost }} {{ recoil_autohost_tachyon_server }}"
+      become: true
+    # There is no API for creating bots yet, so we do it directly in the teiserver
+    # test container, which has the same ssh access as the SPADS ones.
+    - name: Create bot and its credentials in teiserver
+      ansible.builtin.shell: |
+        set -a
+        . /etc/teiserver/teiserver.env
+        /opt/teiserver/live/bin/teiserver rpc '
+          alias Teiserver.{Bot, OAuth, Repo}
+          app = Teiserver.Tachyon.Tasks.SetupApps.ensure_lobby_app()
+          bot = Repo.get_by(Bot.Bot, name: "autohost-{{ inventory_hostname }}")
+            || elem(Bot.create_bot(%{name: "autohost-{{ inventory_hostname }}"}), 1)
+          if OAuth.CredentialQueries.get_credential("{{ recoil_autohost_client_id }}") do
+            IO.puts("exists")
+          else
+            {:ok, _} = OAuth.create_credentials(app, bot, "{{ recoil_autohost_client_id }}", "{{ recoil_autohost_client_secret }}")
+            IO.puts("created")
+          end'
+      args:
+        chdir: /tmp
+      delegate_to: "{{ spads_lobbyHost }}"
+      vars:
+        ansible_user: "{{ hostvars[inventory_hostname].ansible_user }}"
+        ansible_ssh_private_key_file: "{{ hostvars[inventory_hostname].ansible_ssh_private_key_file }}"
+        ansible_ssh_common_args: "{{ hostvars[inventory_hostname].ansible_ssh_common_args }}"
+      become: true
+      become_user: teiserver
+      register: result
+      changed_when: "'created' in result.stdout"
