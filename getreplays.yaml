@@ -1,0 +1,124 @@
+---
+- name: Discover and optionally download time and player matching replays
+  hosts: prod
+  become: true
+  become_user: "{{ spads_username }}"
+  vars:
+    replay_start: "2026-10-25T00:00:00Z"
+    replay_end: "2026-10-25T12:00:00Z"
+    replay_attendees_file: "{{ playbook_dir }}/../attendees.txt"
+    replay_root: "{{ spads_install_path }}/var/ClusterManager"
+    replay_output_dir: "{{ playbook_dir }}/replays"
+    replay_download: false
+  tasks:
+    - name: Create host-specific local output directory
+      ansible.builtin.file:
+        path: "{{ replay_output_dir }}/{{ inventory_hostname }}"
+        state: directory
+        mode: "0700"
+      delegate_to: localhost
+      become: false
+
+    - name: Create temporary scanner directory
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: spads-replay-scan-
+      register: replay_temp
+
+    - name: Scan and collect replays
+      block:
+        - name: Copy standard-library replay scanner
+          ansible.builtin.copy:
+            src: scanreplays.py
+            dest: "{{ replay_temp.path }}/scanreplays.py"
+            mode: "0600"
+
+        - name: Copy attendee names
+          ansible.builtin.copy:
+            content: "{{ lookup('ansible.builtin.file', replay_attendees_file) }}\n"
+            dest: "{{ replay_temp.path }}/attendees.txt"
+            mode: "0600"
+
+        - name: Scan replay headers and player lists
+          ansible.builtin.command:
+            argv:
+              - "{{ ansible_python_interpreter | default('/usr/bin/python3') }}"
+              - "{{ replay_temp.path }}/scanreplays.py"
+              - --root
+              - "{{ replay_root }}"
+              - --attendees
+              - "{{ replay_temp.path }}/attendees.txt"
+              - --start
+              - "{{ replay_start }}"
+              - --end
+              - "{{ replay_end }}"
+          changed_when: false
+          register: replay_scan
+
+        - name: Decode scan manifest
+          ansible.builtin.set_fact:
+            replay_manifest: "{{ replay_scan.stdout | from_json }}"
+
+        - name: Save discovery manifest even when individual files failed
+          ansible.builtin.copy:
+            content: "{{ replay_manifest | combine({'host': inventory_hostname}) | to_nice_json }}\n"
+            dest: "{{ replay_output_dir }}/{{ inventory_hostname }}/manifest.json"
+            mode: "0600"
+          delegate_to: localhost
+          become: false
+
+        - name: Report discovery totals
+          ansible.builtin.debug:
+            msg:
+              host: "{{ inventory_hostname }}"
+              files_seen: "{{ replay_manifest.files_seen }}"
+              files_parsed: "{{ replay_manifest.files_parsed }}"
+              matching_replays: "{{ replay_manifest.matches | length }}"
+              matching_bytes: "{{ replay_manifest.matches | map(attribute='size') | sum }}"
+              errors: "{{ replay_manifest.errors }}"
+              download_enabled: "{{ replay_download | bool }}"
+
+        - name: Reject incomplete discovery
+          ansible.builtin.assert:
+            that: replay_manifest.errors | length == 0
+            fail_msg: "Discovery is incomplete. Inspect this host's manifest.json before retrying."
+
+        - name: Download matching replays with host and instance paths preserved
+          ansible.builtin.fetch:
+            src: "{{ item.path }}"
+            dest: "{{ replay_output_dir }}/files/"
+            flat: false
+            validate_checksum: true
+          loop: "{{ replay_manifest.matches }}"
+          loop_control:
+            label: "{{ item.path }}"
+          when: replay_download | bool
+
+        - name: Verify downloaded size and SHA-256 against discovery
+          ansible.builtin.stat:
+            path: "{{ replay_output_dir }}/files/{{ inventory_hostname }}{{ item.path }}"
+            checksum_algorithm: sha256
+          delegate_to: localhost
+          become: false
+          loop: "{{ replay_manifest.matches }}"
+          loop_control:
+            label: "{{ item.path }}"
+          register: replay_local_files
+          when: replay_download | bool
+
+        - name: Reject missing or changed downloads
+          ansible.builtin.assert:
+            that:
+              - item.stat.exists
+              - item.stat.size == item.item.size
+              - item.stat.checksum == item.item.sha256
+            fail_msg: "Replay missing or changed since discovery: {{ item.item.path }}"
+          loop: "{{ replay_local_files.results }}"
+          loop_control:
+            label: "{{ item.item.path }}"
+          when: replay_download | bool
+      always:
+        - name: Remove this run's temporary scanner directory
+          ansible.builtin.file:
+            path: "{{ replay_temp.path }}"
+            state: absent
