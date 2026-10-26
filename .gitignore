@@ -1,2 +1,4 @@
 /.incus-integration-on
 .ansible/
+/replays/
+__pycache__/
