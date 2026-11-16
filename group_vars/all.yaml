@@ -8,7 +8,7 @@ spads_install_path: "{{ user_homedir }}/spads"
 allow_delete: false
 
 # Engine used by SPADS and recoil autohost
-engine_version: "2026.09.02"
+engine_version: "2026.09.03"
 engine_github_path: "https://github.com/beyond-all-reason/RecoilEngine/releases/download/{{ engine_version }}/recoil_{{ engine_version }}_amd64-linux.7z"
 engine_dir: "recoil_{{ engine_version }}_amd64-linux"
 
