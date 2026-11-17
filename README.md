@@ -46,6 +46,67 @@ If you pull repo and there are changes to that fille, you need to rerun the comm
 - start.yaml - start all SPADS services
 - stop.yaml - stop all SPADS services
 - engineupdate.yaml - runs spads_config_bar_updater.py -c -u (doesn't restart SPADS)
+- getreplays.yaml - discover and optionally download replays matching a start window and player list
+
+## Collecting replays
+
+[getreplays.yaml](getreplays.yaml) targets the `prod` inventory group, including
+engine-testing hosts. It does not check whether games were passworded. Defaults
+select games starting on **25 October 2026 from 01:00 inclusive to 13:00 exclusive
+fixed CET (UTC+01:00)**, i.e. `00:00Z <= start < 12:00Z`. This is deliberately not
+daylight-saving-aware Central European local time.
+
+Run from a Linux Ansible control node (or WSL) with production SSH and sudo access:
+
+```sh
+# Discovery only: saves one manifest per host, downloads no replay files.
+ansible-playbook getreplays.yaml -i inventory/prod-inventory --ask-vault-pass \
+  -e replay_attendees_file=/absolute/path/to/attendees.txt
+
+# Scan again, download matches, and verify size and SHA-256.
+ansible-playbook getreplays.yaml -i inventory/prod-inventory --ask-vault-pass \
+  -e replay_attendees_file=/absolute/path/to/attendees.txt \
+  -e replay_download=true
+```
+
+The default attendee file is `../attendees.txt` relative to this checkout. Provide
+one exact player name per line. Matching is case-sensitive and literal, includes
+clan tags, and excludes spectators; aliases or renamed accounts are not resolved.
+The start script identifies players assigned at game setup, not later joiners.
+
+Optional variables: `replay_start` and `replay_end` (ISO timestamps with explicit
+offsets), `replay_root` (remote directory), and `replay_output_dir` (absolute local
+directory; default `replays` in this checkout). These defaults can be overridden
+using `-e`. Discovery mode is the default, **not** Ansible `--check` mode.
+
+[scanreplays.py](scanreplays.py) uses Python 3.10+ and only the standard library.
+It recursively searches the cluster directory, prefilters recognised UTC filename
+timestamps, then checks the embedded version-5 replay header and setup script.
+Unrecognised filenames are still inspected. Only headers/scripts are decompressed;
+matching compressed files are streamed for SHA-256. It does not validate the
+entire compressed packet stream or guarantee that a replay is playable.
+
+Manifests contain remote paths, game IDs, UTC start times, matching player names,
+sizes, SHA-256 checksums, and per-file errors. They are saved at
+`replays/<inventory-host>/manifest.json`. Downloads preserve both host and remote
+instance directories beneath `replays/files/`, avoiding filename collisions.
+Repeated downloads use Ansible's checksum comparison to skip unchanged files.
+The download run rescans current files; it does not reuse an earlier manifest.
+
+Missing roots, malformed candidate replays, traversal errors, and changed files
+are reported as failures. Per-file scan errors are persisted before blocking that
+host's downloads. Ansible reports unreachable hosts and transfer failures in its
+recap: **a failed host means collection is incomplete**, even if others succeed.
+Successful downloads are checked against the scan manifest. Fetch with sudo can
+buffer matched replays in memory, so account for large files on hosts/control node.
+Host cleanup may delete older replays, especially under disk pressure; collect
+promptly. This playbook does not pause cleanup or alter SPADS services.
+
+Local scanner tests (no host connections):
+
+```sh
+python3 -m unittest discover -s tests -v
+```
 
 ## Ansible Vault
 Ansible Vault provides a way to encrypt sensitive information used by Ansible. It'll prompt for the password when running a command.
