@@ -1,1 +1,3 @@
 spads_maxInstances: 150
+
+maintenance_windows: ["Mon,Thu 23:00 UTC"]

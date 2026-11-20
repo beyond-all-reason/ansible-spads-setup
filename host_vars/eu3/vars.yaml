@@ -1,3 +1,5 @@
 spads_maxInstances: 25
 # The rapid repos hosted here open 80/443 themselves, see
 # https://github.com/beyond-all-reason/rapid-hosting
+
+maintenance_windows: ["Mon,Thu 10:00 UTC"]

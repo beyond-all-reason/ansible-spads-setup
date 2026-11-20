@@ -1,0 +1,35 @@
+- name: Install unattended upgrades
+  ansible.builtin.package:
+    name: unattended-upgrades
+    state: present
+
+# Written explicitly, as some provider images ship with it disabled.
+- name: Enable unattended upgrades
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    mode: "0644"
+
+- name: Install maintenance reboot script
+  ansible.builtin.copy:
+    src: maintenance_reboot.sh
+    dest: /usr/local/sbin/maintenance_reboot.sh
+    mode: "0755"
+
+- name: Install maintenance reboot units
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/etc/systemd/system/{{ item }}"
+    mode: "0644"
+  loop:
+    - maintenance_reboot.service
+    - maintenance_reboot.timer
+
+- name: Configure maintenance reboot timer
+  ansible.builtin.systemd_service:
+    name: maintenance_reboot.timer
+    daemon_reload: true
+    enabled: "{{ maintenance_windows | length > 0 }}"
+    state: "{{ (maintenance_windows | length > 0) | ternary('started', 'stopped') }}"
