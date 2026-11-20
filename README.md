@@ -4,17 +4,19 @@ This repository contains Ansible playbooks for setting up SPADS servers and opti
 
 ## Dependencies
 
+Ansible is managed via [uv](https://docs.astral.sh/uv/). Make sure you have `uv` installed and prefix Ansible commands with `uv run`.
+
 Make sure required collections are installed by running:
 
 ```
-ansible-galaxy collection install -r requirements.yml
+uv run sync-collections
 ```
 
-If you pull repo and there are changes to that fille, you need to rerun the command to make sure you pick up latest changes.
+If you pull repo and there are changes to `requirements.yml`, you need to rerun the command to make sure you pick up latest changes.
 
 ## On the Ansible server
-1. Install Ansible and sshpass.
-   > sudo apt install ansible sshpass
+1. Install [uv](https://docs.astral.sh/uv/) (which manages Ansible) and sshpass.
+   > sudo apt install sshpass
 2. SSH to each client once and accept their key to add them to the known hosts.
 3. Checkout this repo and then run any following Ansible command from the checked out folder.
 4. Configure the variable files
@@ -23,21 +25,21 @@ If you pull repo and there are changes to that fille, you need to rerun the comm
    - groups_vars/(region).yaml - variables specific to a region (AU, EU, US).
    - host_vars/(hostname).yaml - contains the variables specific to the host. Anything set here will override all other
 6. Run Ansible. The typical syntax for running Ansible with some files encrypted with Ansible Vault is:
-   > ansible-playbook (playbookfile) -i (inventoryfile) --ask-vault-pass
+   > uv run ansible-playbook (playbookfile) -i (inventoryfile) --ask-vault-pass
 
    If no files are encrypted --ask-vault-pass can be removed.
 
    Run can be limited to a specific host with --limit (hostname) \
    Note: use the hostname set in the inventory file
-   > ansible-playbook (playbookfile) -i (inventoryfile) --limit (hostname)
+   > uv run ansible-playbook (playbookfile) -i (inventoryfile) --limit (hostname)
 
 ## Examples
 
 **Configure/verify SPADS is configured properly on all servers**
-> ansible-playbook play.yaml --ask-vault-pass
+> uv run ansible-playbook play.yaml --ask-vault-pass
 
 **Restart all SPADS services only on US2**
-> ansible-playbook restart.yaml --limit us2 --ask-vault-pass
+> uv run ansible-playbook restart.yaml --limit us2 --ask-vault-pass
 
 ## Available playbooks:
 - play.yaml - configure SPADS/verify SPADS is configured properly
@@ -51,19 +53,19 @@ If you pull repo and there are changes to that fille, you need to rerun the comm
 Ansible Vault provides a way to encrypt sensitive information used by Ansible. It'll prompt for the password when running a command.
 
 **View encrypted file**
-> ansible-vault view file1.yaml file2.yaml file3.yaml
+> uv run ansible-vault view file1.yaml file2.yaml file3.yaml
 
 **Encrypt an existing file**
-> ansible-vault encrypt file1.yaml file2.yaml file3.yaml
+> uv run ansible-vault encrypt file1.yaml file2.yaml file3.yaml
 
 **Edit an encrypted file**
-> ansible-vault edit file.yaml
+> uv run ansible-vault edit file.yaml
 
 **Decrypt a file**
-> ansible-vault decrypt file1.yaml file2.yaml file3.yaml
+> uv run ansible-vault decrypt file1.yaml file2.yaml file3.yaml
 
 **Change the encrpytion key of a file**
-> ansible-vault rekey file1.yaml file2.yaml file3.yaml
+> uv run ansible-vault rekey file1.yaml file2.yaml file3.yaml
 
 ## Recoil autohost
 
@@ -97,7 +99,7 @@ This creates spads instance `TEST1`. You can create any number of them `TEST2`, 
 Then test that it works for ansible:
 
 ```
-ansible test1 -m shell -a 'uname -a'
+uv run ansible test1 -m shell -a 'uname -a'
 ```
 
 ### Usage
@@ -107,13 +109,13 @@ ansible test1 -m shell -a 'uname -a'
 Now you can use all the playbooks and roles as usual, just make sure you are targeting the `dev` inventory group or individual `test1` host. For example:
 
 ```
-ansible-playbook -l dev play.yaml
+uv run ansible-playbook -l dev play.yaml
 ```
 
 To override the lobby server temporarily from default `localhost` without modifying [dev.yaml](group_vars/dev.yaml) for test1:
 
 ```
-ansible-playbook -l test1 -e "spads_lobbyHost=10.177.67.244" play.yaml
+uv run ansible-playbook -l test1 -e "spads_lobbyHost=10.177.67.244" play.yaml
 ```
 
 #### Connect to the container
@@ -127,7 +129,7 @@ incus exec spads-test1 -- /bin/bash
 You can also ssh into it with something like:
 
 ```
-ssh -i test.ssh.key ansible@$(ansible-inventory --host test1 | jq -r '.ansible_host')
+ssh -i test.ssh.key ansible@$(uv run ansible-inventory --host test1 | jq -r '.ansible_host')
 ```
 
 #### Register bot with teiserver
@@ -135,7 +137,7 @@ ssh -i test.ssh.key ansible@$(ansible-inventory --host test1 | jq -r '.ansible_h
 You can register the spads lobby account with teiserver using the `register_bot.yaml` playbook:
 
 ```
-ansible-playbook -l test1 register_bot.yaml
+uv run ansible-playbook -l test1 register_bot.yaml
 ```
 
 After that, you have to give the newly created account "Bot", "Verified" **and "Moderator"** roles manually in the teiserver web interface.
@@ -149,7 +151,7 @@ To configure sending metrics to local monitoring host set up with [ansible-monit
 
 ```
 MON_HOST_IP=$(incus list -f csv -c 4 bar-mon-test | grep -E 'eth|enp' | cut -d' ' -f1)
-ansible-playbook -l test play.yaml --diff -t monitoring \
+uv run ansible-playbook -l test play.yaml --diff -t monitoring \
   -e "{ configure_monitoring: true, monitoring_write_host_ip: $MON_HOST_IP }"
 ```
 
@@ -158,7 +160,7 @@ ansible-playbook -l test play.yaml --diff -t monitoring \
 Autohost is enabled in dev. To connect it to the teiserver test container set up with [ansible-teiserver](https://github.com/beyond-all-reason/ansible-teiserver) playbook, run the `register_autohost.yaml` playbook once. It makes `teiserver.local` resolve to `spads_lobbyHost` (teiserver's OAuth2 token endpoint uses its domain name), and creates the bot with credentials from [dev.yaml](group_vars/dev.yaml) in teiserver over ssh:
 
 ```
-ansible-playbook -l test1 -e "spads_lobbyHost=10.177.67.244" register_autohost.yaml
+uv run ansible-playbook -l test1 -e "spads_lobbyHost=10.177.67.244" register_autohost.yaml
 ```
 
 ### Cleanup

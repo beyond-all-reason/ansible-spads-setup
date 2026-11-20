@@ -1,8 +1,10 @@
 collections:
   - name: https://github.com/beyond-all-reason/ansible-monitoring.git
     type: git
-    version: 51c30651b47f9c6f0b0c1f14b3db3f969de24201
+    version: 866739d16be72e76cb5ed7e48d224fbb4d7db598
   - name: ansible.posix
-    version: 2.2.2
+    version: "2.2.2"
+  - name: community.general
+    version: "14.0.1"
   - name: containers.podman
-    version: 1.21.0
+    version: "1.21.2"

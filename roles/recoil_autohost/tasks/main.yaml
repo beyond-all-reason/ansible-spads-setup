@@ -47,7 +47,7 @@
       tachyonServer: "{{ recoil_autohost_tachyon_server }}"
       authClientId: "{{ recoil_autohost_client_id }}"
       authClientSecret: "{{ recoil_autohost_client_secret }}"
-      hostingIP: "{{ ansible_default_ipv4.address }}"
+      hostingIP: "{{ ansible_facts['default_ipv4']['address'] }}"
       engineStartPort: "{{ recoil_autohost_engine_start_port | int }}"
       engineAutohostStartPort: "{{ recoil_autohost_engine_autohost_start_port | int }}"
       maxPortsUsed: "{{ recoil_autohost_max_ports | int }}"
