@@ -18,14 +18,23 @@
     dest: /usr/local/sbin/maintenance_reboot.sh
     mode: "0755"
 
-- name: Install maintenance reboot units
+- name: Install maintenance reboot service unit
   ansible.builtin.template:
-    src: "{{ item }}.j2"
-    dest: "/etc/systemd/system/{{ item }}"
+    src: maintenance_reboot.service.j2
+    dest: /etc/systemd/system/maintenance_reboot.service
     mode: "0644"
-  loop:
-    - maintenance_reboot.service
-    - maintenance_reboot.timer
+
+- name: Install maintenance reboot timer unit
+  ansible.builtin.template:
+    src: maintenance_reboot.timer.j2
+    dest: /etc/systemd/system/maintenance_reboot.timer
+    mode: "0644"
+  when: maintenance_windows | length > 0
+
+- name: Check if maintenance reboot timer unit exists
+  ansible.builtin.stat:
+    path: /etc/systemd/system/maintenance_reboot.timer
+  register: maintenance_timer_unit
 
 - name: Configure maintenance reboot timer
   ansible.builtin.systemd_service:
@@ -33,3 +42,10 @@
     daemon_reload: true
     enabled: "{{ maintenance_windows | length > 0 }}"
     state: "{{ (maintenance_windows | length > 0) | ternary('started', 'stopped') }}"
+  when: maintenance_windows | length > 0 or maintenance_timer_unit.stat.exists
+
+- name: Remove maintenance reboot timer unit
+  ansible.builtin.file:
+    path: /etc/systemd/system/maintenance_reboot.timer
+    state: absent
+  when: maintenance_windows | length == 0
