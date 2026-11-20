@@ -32,7 +32,7 @@
                     - "recoil-autohost.dns.podman:{{ recoil_autohost_metrics_port }}"
               relabel_configs:
                 - target_label: instance
-                  replacement: "{{ ansible_hostname }}"
+                  replacement: "{{ ansible_facts['hostname'] }}"
         monitoring_log_configs:
           fluent_bit: "{{ [spads_log_config] + (recoil_autohost_enabled | bool | ternary([recoil_autohost_log_config], [])) }}"
         spads_log_config:
