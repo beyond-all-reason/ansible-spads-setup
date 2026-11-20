@@ -10,6 +10,13 @@
       tags: recoil_autohost
       when: recoil_autohost_enabled | bool
 
+    - role: maintenance
+      become: true
+      tags: maintenance
+      vars:
+        maintenance_stop_services: >-
+          {{ ['spads.service'] + (recoil_autohost_enabled | bool | ternary(['recoil-autohost.service'], [])) }}
+
     # Run once, after all roles above, with the scrape and log configs of all of them.
     - role: beyondallreason.monitoring.client
       become: true

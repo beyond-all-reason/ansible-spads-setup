@@ -37,7 +37,6 @@ package_dependencies:
   - swig
   - tmux
   - ufw
-  - unattended-upgrades
   - wget
   - xz-utils # for ansible's apt to be able to download and install from a :// url
   - zstd

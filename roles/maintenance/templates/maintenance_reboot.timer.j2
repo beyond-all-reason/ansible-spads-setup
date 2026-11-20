@@ -1,0 +1,12 @@
+[Unit]
+Description=Maintenance windows for host reboots
+
+[Timer]
+{% for window in maintenance_windows %}
+OnCalendar={{ window }}
+{% endfor %}
+AccuracySec=1min
+Persistent=false
+
+[Install]
+WantedBy=timers.target

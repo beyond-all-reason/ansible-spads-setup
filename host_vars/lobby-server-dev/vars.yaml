@@ -21,3 +21,5 @@ configure_monitoring: false
 recoil_autohost_enabled: true
 recoil_autohost_client_id: "98edafe9-0adb-4e97-a5da-781cd8d13931"
 recoil_autohost_client_secret: "{{ vault_recoil_autohost_client_secret }}"
+
+maintenance_windows: ["Mon,Thu 03:00 UTC"]

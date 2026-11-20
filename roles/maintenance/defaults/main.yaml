@@ -1,0 +1,8 @@
+---
+# Maintenance windows in systemd OnCalendar format, set per host. In each
+# window host is rebooted when /run/reboot-required exists or when uptime
+# is over maintenance_max_uptime_days.
+maintenance_windows: []
+maintenance_max_uptime_days: 30
+# Services stopped, in parallel, before the reboot.
+maintenance_stop_services: []

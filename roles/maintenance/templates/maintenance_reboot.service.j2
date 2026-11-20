@@ -1,0 +1,7 @@
+[Unit]
+Description=Reboot host in maintenance window if needed
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/maintenance_reboot.sh {{ maintenance_max_uptime_days }} {{ maintenance_stop_services | join(' ') }}
+TimeoutStartSec=infinity
