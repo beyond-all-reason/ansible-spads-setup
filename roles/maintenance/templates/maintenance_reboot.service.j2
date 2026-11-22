@@ -3,5 +3,8 @@ Description=Reboot host in maintenance window if needed
 
 [Service]
 Type=oneshot
+{% if maintenance_discord_webhook_url | default('', true) | length > 0 %}
+EnvironmentFile=/etc/default/maintenance_reboot
+{% endif %}
 ExecStart=/usr/local/sbin/maintenance_reboot.sh {{ maintenance_max_uptime_days }} {{ maintenance_stop_services | join(' ') }}
 TimeoutStartSec=infinity

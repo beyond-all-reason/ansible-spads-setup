@@ -30,3 +30,5 @@ monitoring_logs_write_password: "{{ vault_monitoring_logs_write_password }}"
 
 # By default don't turnup autohost.
 recoil_autohost_enabled: false
+
+maintenance_discord_webhook_url: "{{ vault_maintenance_discord_webhook_url }}"
