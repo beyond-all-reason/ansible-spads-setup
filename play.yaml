@@ -16,6 +16,7 @@
       vars:
         maintenance_stop_services: >-
           {{ ['spads.service'] + (recoil_autohost_enabled | bool | ternary(['recoil-autohost.service'], [])) }}
+        maintenance_discord_username: "GameServer[{{ inventory_hostname | upper }}]"
 
     # Run once, after all roles above, with the scrape and log configs of all of them.
     - role: beyondallreason.monitoring.client

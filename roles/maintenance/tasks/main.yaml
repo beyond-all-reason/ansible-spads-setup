@@ -1,6 +1,9 @@
-- name: Install unattended upgrades
+- name: Install maintenance packages
   ansible.builtin.package:
-    name: unattended-upgrades
+    name:
+      - unattended-upgrades
+      - curl
+      - jo
     state: present
 
 # Written explicitly, as some provider images ship with it disabled.
@@ -18,11 +21,32 @@
     dest: /usr/local/sbin/maintenance_reboot.sh
     mode: "0755"
 
+- name: Install maintenance reboot environment file
+  ansible.builtin.template:
+    src: maintenance_reboot.env.j2
+    dest: /etc/default/maintenance_reboot
+    mode: "0600"
+  when: maintenance_discord_webhook_url | default('', true) | length > 0
+  no_log: true
+  diff: false
+
+- name: Remove maintenance reboot environment file
+  ansible.builtin.file:
+    path: /etc/default/maintenance_reboot
+    state: absent
+  when: maintenance_discord_webhook_url | default('', true) | length == 0
+
 - name: Install maintenance reboot service unit
   ansible.builtin.template:
     src: maintenance_reboot.service.j2
     dest: /etc/systemd/system/maintenance_reboot.service
     mode: "0644"
+  register: maintenance_service_unit
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  when: maintenance_service_unit.changed
 
 - name: Install maintenance reboot timer unit
   ansible.builtin.template:

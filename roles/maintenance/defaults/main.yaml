@@ -6,3 +6,6 @@ maintenance_windows: []
 maintenance_max_uptime_days: 30
 # Services stopped, in parallel, before the reboot.
 maintenance_stop_services: []
+# Discord webhook URL for reboot notifications. Unset/empty disables notifications.
+maintenance_discord_webhook_url: ""
+maintenance_discord_username: "{{ inventory_hostname }}"
